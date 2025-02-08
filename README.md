@@ -73,7 +73,7 @@
 ### Testing
 - [ ] **[`stretchr/testify`](https://github.com/stretchr/testify)** – Toolkit with common assertions and mocks.
 
-## Utils
+### Utils
 - [ ] **[`gookit/goutil`](https://github.com/gookit/goutil)** – A collection of utility functions for Go.
 - [ ] **[`securego/gosec`](https://github.com/securego/gosec)** – Golang security scanner.
 
