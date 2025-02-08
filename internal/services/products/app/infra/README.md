@@ -1,1 +1,0 @@
-# Different Business Implementation
