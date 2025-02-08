@@ -1,0 +1,1 @@
+# Application Errors Codes
