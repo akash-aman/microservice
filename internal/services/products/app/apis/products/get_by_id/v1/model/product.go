@@ -1,19 +1,11 @@
 package model
 
 type GetProductById struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Stock       int     `json:"stock"`
+	ID string `validate:"required,gte=2,lte=50"`
 }
 
-func NewGetProductById(id, name, description string, price float64, stock int) *GetProductById {
+func NewGetProductById(id string) *GetProductById {
 	return &GetProductById{
-		ID:          id,
-		Name:        name,
-		Description: description,
-		Price:       price,
-		Stock:       stock,
+		ID: id,
 	}
 }
