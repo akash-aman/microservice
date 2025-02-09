@@ -40,6 +40,8 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.
 
 			log.Info("All servers shut down gracefully")
 
+			log.Sync()
+
 			return nil
 		},
 	})
