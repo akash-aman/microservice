@@ -8,3 +8,12 @@ type ProductResponseDto struct {
 	Stock       int     `json:"stock"`
 }
 
+func NewProductResponseDto(id, name, description string, price float64, stock int) *ProductResponseDto {
+	return &ProductResponseDto{
+		ID:          id,
+		Name:        name,
+		Description: description,
+		Price:       price,
+		Stock:       stock,
+	}
+}

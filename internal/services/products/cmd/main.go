@@ -6,7 +6,8 @@ import (
 	"pkg/logger"
 	"products/conf"
 	"products/server"
-
+	"products/app/inits"
+	"github.com/go-playground/validator"
 	"go.uber.org/fx"
 )
 
@@ -22,8 +23,11 @@ func main() {
 			logger.InitLogger,
 			conf.InitConfig,
 			http.NewContext,
+			validator.New,
 			httpServer.NewEchoServer,
 		),
 		fx.Invoke(server.RunServers),
+		fx.Invoke(inits.InitMediator),
+		fx.Invoke(inits.ConfigEndpoints),
 	).Run()
 }
