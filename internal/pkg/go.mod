@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/lib/pq v1.10.9
 	github.com/sirupsen/logrus v1.9.3
 	go.uber.org/zap v1.27.0
 )

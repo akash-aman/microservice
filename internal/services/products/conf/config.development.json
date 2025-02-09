@@ -23,5 +23,19 @@
         "writeTimeout": "10s",
         "BaseRoute": "/api",
         "debugMode": true
+    },
+    "sql": {
+        "host": "localhost",
+        "name": "mysql",
+        "port": 3306,
+        "user": "user",
+        "password": "password",
+        "dbName": "mydatabase",
+        "sslMode": "disable",
+        "ConnStr": "user:password@tcp(localhost:3306)/mydatabase?parseTime=true",
+        "maxIdleConns": 10,
+        "maxOpenConns": 10,
+        "maxLifeTime": 3,
+        "maxIdleTime": 3
     }
 }

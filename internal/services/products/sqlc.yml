@@ -1,0 +1,11 @@
+version: "2"
+cloud:
+  project: "Products"
+sql:
+- schema: "sqlc/mysql/schema/*.sql"
+  queries: "sqlc/mysql/queries/*.sql"
+  engine: "mysql"
+  gen:
+    go:
+      package: "db"
+      out: "./app/db"

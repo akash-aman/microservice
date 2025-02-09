@@ -72,3 +72,12 @@ The following is the folder structure of the project:
 - **logs**: Error & access logs.
 - **server**: Server related code.
 - **sqlc**: SQL code and database migrations.
+
+
+```
+sudo go run -mod=mod entgo.io/ent/cmd/ent generate --target ./app/data/ent ./ent/schema
+```
+wa
+```
+go run -mod=mod entgo.io/ent/cmd/ent describe ./ent/schema
+```

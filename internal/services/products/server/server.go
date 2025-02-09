@@ -7,12 +7,14 @@ import (
 	"pkg/http/server"
 	"pkg/logger"
 	"products/conf"
+	"products/ent/generated"
 
 	"github.com/labstack/echo/v4"
+
 	"go.uber.org/fx"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.Config, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *generated.Client, log logger.ILogger, config *conf.Config, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -36,6 +38,9 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.
 				return c.String(http.StatusOK, config.Service.Name)
 			})
 
+			if err := client.Schema.Create(ctx); err != nil {
+				log.Fatalf("failed creating schema resources: %v", err)
+			}
 			return nil
 		},
 		OnStop: func(stopCtx context.Context) error {
