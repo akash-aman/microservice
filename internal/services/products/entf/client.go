@@ -1,9 +1,9 @@
-package ent
+package entf
 
 import (
 	"database/sql"
 	"pkg/db"
-	"products/ent/generated"
+	"products/entf/generated"
 
 	entsql "entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"

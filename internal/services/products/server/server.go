@@ -7,7 +7,7 @@ import (
 	"pkg/http/server"
 	"pkg/logger"
 	"products/conf"
-	"products/ent/generated"
+	"products/entf/generated"
 
 	"github.com/labstack/echo/v4"
 

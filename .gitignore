@@ -24,4 +24,4 @@ go.work.sum
 # env file
 .env
 
-internal/services/products/ent/generated
+internal/services/products/entf/generated

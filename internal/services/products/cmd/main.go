@@ -7,7 +7,7 @@ import (
 	"pkg/logger"
 	"products/app/inits"
 	"products/conf"
-	"products/ent"
+	"products/entf"
 	"products/server"
 
 	"github.com/go-playground/validator"
@@ -29,7 +29,7 @@ func main() {
 			validator.New,
 			db.NewConnectPool,
 			httpServer.NewEchoServer,
-			ent.NewEntClient,
+			entf.NewEntClient,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),
