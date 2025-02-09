@@ -1,0 +1,28 @@
+{
+    "service": {
+        "name": "products",
+        "version": "0.0.1",
+        "protocol": [
+            "http",
+            "graphql",
+            "grpc",
+            "wss"
+        ]
+    },
+    "logger": {
+        "level": "debug",
+        "type": "zap",
+        "fileLogging": false,
+        "accessLog": "logs/access.log",
+        "errorLog": "logs/error.log",
+        "flushLogsOnShutdown": true
+    },
+    "echo": {
+        "port": ":3000",
+        "host": "localhost",
+        "readTimeout": "10s",
+        "writeTimeout": "10s",
+        "BaseRoute": "/api",
+        "debugMode": true
+    }
+}
