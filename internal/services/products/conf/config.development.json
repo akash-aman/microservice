@@ -12,7 +12,7 @@
     "logger": {
         "level": "debug",
         "type": "zap",
-        "fileLogging": false,
+        "fileLogging": true,
         "accessLog": "logs/access.log",
         "errorLog": "logs/error.log",
         "flushLogsOnShutdown": true
