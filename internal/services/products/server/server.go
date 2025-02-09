@@ -17,6 +17,9 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 
+			/**
+			 * Http Server.
+			 */
 			go func() {
 
 				log.Infof("Starting echo server on port %v", config.Echo.Port)
@@ -26,6 +29,9 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.
 				}
 			}()
 
+			/**
+			 * Service Route.
+			 */
 			e.GET("/", func(c echo.Context) error {
 				return c.String(http.StatusOK, config.Service.Name)
 			})
