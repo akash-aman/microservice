@@ -16,12 +16,11 @@ const (
  * LoggerConfig holds configuration for the logger
  */
 type LoggerConfig struct {
-	LogLevel            string     `mapstructure:"level" validate:"required"`
-	Type                LoggerType `mapstructure:"type" validate:"required"`
-	FileLogging         bool       `mapstructure:"fileLogging" validate:"required"`
-	AccessLog           string     `mapstructure:"accessLog" validate:"required"`
-	ErrorLog            string     `mapstructure:"errorLog" validate:"required"`
-	FlushLogsOnShutdown bool       `mapstructure:"flushLogsOnShutdown" validate:"required"`
+	LogLevel    string     `mapstructure:"level" validate:"required"`
+	Type        LoggerType `mapstructure:"type" validate:"required"`
+	FileLogging bool       `mapstructure:"fileLogging" validate:"required"`
+	AccessLog   string     `mapstructure:"accessLog" validate:"required"`
+	ErrorLog    string     `mapstructure:"errorLog" validate:"required"`
 }
 
 /**

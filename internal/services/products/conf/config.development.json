@@ -14,8 +14,7 @@
         "type": "zap",
         "fileLogging": true,
         "accessLog": "logs/access.log",
-        "errorLog": "logs/error.log",
-        "flushLogsOnShutdown": true
+        "errorLog": "logs/error.log"
     },
     "echo": {
         "port": ":3000",
