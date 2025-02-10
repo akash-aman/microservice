@@ -75,7 +75,8 @@ The following is the folder structure of the project:
 
 
 ```
-sudo go run -mod=mod entgo.io/ent/cmd/ent generate --target ./app/data/ent ./ent/schema
+go run -mod=mod entgo.io/ent/cmd/ent generate --target ./ent/generated ./ent/schema
+go run -mod=mod entgo.io/contrib/entgql generate --target ./ent/generated ./ent/schema
 ```
 wa
 ```

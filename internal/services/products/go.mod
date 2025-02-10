@@ -7,22 +7,26 @@ replace pkg => ../../pkg
 require (
 	entgo.io/contrib v0.6.0
 	entgo.io/ent v0.14.1
+	github.com/99designs/gqlgen v0.17.64
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/labstack/echo/v4 v4.13.3
+	github.com/lib/pq v1.10.9
 	github.com/mehdihadeli/go-mediatr v1.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.19.0
+	github.com/vektah/gqlparser/v2 v2.5.22
 	go.uber.org/fx v1.23.0
+	golang.org/x/sync v0.11.0
 	pkg v0.0.1
 )
 
 require (
 	ariga.io/atlas v0.25.1-0.20240717145915-af51d3945208 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/99designs/gqlgen v0.17.48 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
-	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/agnivade/levenshtein v1.2.0 // indirect
 	github.com/ahmetb/go-linq/v3 v3.2.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -33,11 +37,11 @@ require (
 	github.com/goccy/go-reflect v1.2.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -55,7 +59,6 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.12 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/zclconf/go-cty v1.14.4 // indirect
@@ -66,7 +69,6 @@ require (
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect

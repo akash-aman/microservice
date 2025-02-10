@@ -1,0 +1,3 @@
+2025-02-09T23:59:39.418+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 30559}
+2025-02-09T23:59:39.419+0530	info	logger/zap.go:61		{"pid": 30559, "value": ["HTTP server shutdown successfully"]}
+2025-02-09T23:59:39.419+0530	info	logger/zap.go:61		{"pid": 30559, "value": ["All servers shut down gracefully"]}

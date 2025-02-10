@@ -7,14 +7,18 @@ import (
 	"pkg/http/server"
 	"pkg/logger"
 	"products/conf"
-	"products/entf/generated"
+	"products/ent/gen"
 
+	// "entgo.io/contrib/entgql"
+	// "github.com/99designs/gqlgen/graphql/handler"
+	// "github.com/99designs/gqlgen/graphql/handler/debug"
+	// "github.com/99designs/gqlgen/graphql/playground"
 	"github.com/labstack/echo/v4"
 
 	"go.uber.org/fx"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, client *generated.Client, log logger.ILogger, config *conf.Config, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -38,9 +42,26 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *generated.Client, log log
 				return c.String(http.StatusOK, config.Service.Name)
 			})
 
-			if err := client.Schema.Create(ctx); err != nil {
-				log.Fatalf("failed creating schema resources: %v", err)
-			}
+			/**
+			 * Migration
+			 */
+			go func() {
+				if err := client.Schema.Create(ctx); err != nil {
+					log.Fatalf("failed creating schema resources: %v", err)
+				}
+			}()
+
+			// srv := handler.NewDefaultServer(generated.NewSchema(client))
+			// srv.Use(entgql.Transactioner{TxOpener: client})
+			// if cli.Debug {
+			// 	srv.Use(&debug.Tracer{})
+			// }
+
+			// http.Handle("/",
+			// 	playground.Handler("Todo", "/query"),
+			// )
+			// http.Handle("/query", srv)
+
 			return nil
 		},
 		OnStop: func(stopCtx context.Context) error {
