@@ -34,6 +34,7 @@ The following is the folder structure of the project:
 ├── conf
 ├── docs
 ├── logs
+├── cgfx
 ├── server
 └── sqlc
 ```
@@ -69,6 +70,7 @@ The following is the folder structure of the project:
 - **cmd**: Command line interface related code.
 - **conf**: Configuration files.
 - **docs**: Documentation files.
+- **cgfx**: Code generation frameworks like entity framework, sqlc, gqlgen.
 - **logs**: Error & access logs.
 - **server**: Server related code.
 - **sqlc**: SQL code and database migrations.

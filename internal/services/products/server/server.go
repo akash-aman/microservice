@@ -7,7 +7,7 @@ import (
 	"pkg/http/server"
 	"pkg/logger"
 	"products/conf"
-	"products/ent/gen"
+	"products/cgfx/ent/gen"
 
 	// "entgo.io/contrib/entgql"
 	// "github.com/99designs/gqlgen/graphql/handler"

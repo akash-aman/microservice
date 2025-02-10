@@ -3,7 +3,7 @@ package inits
 import (
 	"database/sql"
 	"pkg/db"
-	"products/ent/gen"
+	"products/cgfx/ent/gen"
 
 	entsql "entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"

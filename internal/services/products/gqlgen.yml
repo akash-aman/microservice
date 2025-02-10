@@ -1,12 +1,12 @@
 # schema tells gqlgen where the GraphQL schema is located.
 schema:
-- gql/ent.graphql
+- cgfx/gql/ent.graphql
 
 # resolver reports where the resolver implementations go.
 resolver:
   layout: single-file
   dir: .
-  filename: gql/resolver.go
+  filename: cgfx/gql/resolver.go
   package: gql
 
 # gqlgen will search for any type names in the schema in these go packages
@@ -15,11 +15,11 @@ resolver:
 # autobind tells gqlgen to search for any type names in the GraphQL schema in the
 # provided package. If they match it will use them, otherwise it will generate new.
 autobind:
-- products/ent/gen
-- products/ent/gen/comment
-- products/ent/gen/user
-- products/ent/gen/userlike
-- products/ent/gen/userpost
+- products/cgfx/ent/gen
+- products/cgfx/ent/gen/comment
+- products/cgfx/ent/gen/user
+- products/cgfx/ent/gen/userlike
+- products/cgfx/ent/gen/userpost
 
 # This section declares type mapping between the GraphQL and Go type systems.
 models:
@@ -29,9 +29,9 @@ models:
       - github.com/99designs/gqlgen/graphql.IntID
   Node:
     model:
-      - products/ent/gen.Noder
+      - products/cgfx/ent/gen.Noder
 
 # Specifies where to generate the code
 exec:
-  filename: gql/generated.go
+  filename: cgfx/gql/generated.go
   package: gql
