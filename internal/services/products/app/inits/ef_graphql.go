@@ -33,12 +33,12 @@ func InitGraphQLServer(client *gen.Client, log logger.ILogger) {
 
 	srv.Use(extension.Introspection{})
 
-	http.Handle("/", playground.Handler("Todo", "/query"))
+	http.Handle("/graphql", playground.Handler("Todo", "/query"))
 	http.Handle("/query", srv)
 
 	log.Infof("Starting GraphQL Server on port :3001")
 
-	if err := http.ListenAndServe(":30001", nil); !errors.Is(err, http.ErrServerClosed) {
+	if err := http.ListenAndServe(":3001", nil); !errors.Is(err, http.ErrServerClosed) {
 		log.Error("Error starting GraphQL server", err)
 	}
 }
