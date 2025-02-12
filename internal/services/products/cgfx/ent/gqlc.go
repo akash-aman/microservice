@@ -15,8 +15,9 @@ func main() {
 		// Tell Ent to generate a GraphQL schema for
 		// the Ent schema in a file named ent.graphql.
 		entgql.WithSchemaGenerator(),
-		entgql.WithSchemaPath("cgfx/gql/ent.graphql"),
+		entgql.WithSchemaPath("./cgfx/gql/ent.graphql"),
 		entgql.WithConfigPath("gqlgen.yml"),
+		entgql.WithWhereInputs(true),
 	)
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)
@@ -25,7 +26,7 @@ func main() {
 		entc.Extensions(ex),
 	}
 	if err := entc.Generate("./cgfx/ent/schema", &gen.Config{
-		Target:  "cgfx/ent/gen",
+		Target:  "./cgfx/ent/gen",
 		Package: "products/cgfx/ent/gen",
 	}, opts...); err != nil {
 		log.Fatalf("running ent codegen: %v", err)

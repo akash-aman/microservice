@@ -1,18 +1,14 @@
-// schema/schema.go
 package schema
 
 import (
     "time"
-    "entgo.io/ent"
-    "entgo.io/ent/schema/field"
-    "entgo.io/ent/schema/edge"
+
     "entgo.io/contrib/entgql"
+    "entgo.io/ent"
     "entgo.io/ent/schema"
+    "entgo.io/ent/schema/edge"
+    "entgo.io/ent/schema/field"
 )
-
-// First, let's create a file for GraphQL configuration
-// File: ent/entc.go
-
 
 // Define enum types
 type Status string
@@ -39,10 +35,21 @@ type User struct {
 func (User) Fields() []ent.Field {
     return []ent.Field{
         field.Int("id").
-            Positive().
             Immutable().
             Annotations(
                 entgql.OrderField("ID"),
+            ),
+        field.String("firstname").
+            MinLen(4).
+            MaxLen(20).
+            Annotations(
+                entgql.OrderField("FIRSTNAME"),
+            ),
+        field.String("lastname").
+            MinLen(4).
+            MaxLen(20).
+            Annotations(
+                entgql.OrderField("LASTNAME"),
             ),
         field.String("username").
             Unique().
@@ -74,162 +81,46 @@ func (User) Fields() []ent.Field {
             Annotations(
                 entgql.OrderField("UPDATED_AT"),
             ),
-        field.Bool("is_active").
-            Default(true).
-            Annotations(
-                entgql.OrderField("IS_ACTIVE"),
-            ),
     }
 }
 
 func (User) Edges() []ent.Edge {
     return []ent.Edge{
-        edge.To("authored_posts", Post.Type).
-            Through("user_posts", UserPost.Type).
-            Annotations(entgql.RelayConnection()),
-        edge.To("comments", Comment.Type).
-            Annotations(entgql.RelayConnection()),
-        edge.To("likes", Post.Type).
-            Through("user_likes", UserLike.Type).
+        edge.To("orders", Order.Type).
             Annotations(entgql.RelayConnection()),
     }
 }
 
 func (User) Annotations() []schema.Annotation {
     return []schema.Annotation{
-        entgql.QueryField(),
-        entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
         entgql.RelayConnection(),
+        entgql.QueryField().Description("This is the single user"),
+        entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
+        entgql.MultiOrder(),
     }
 }
 
-// Post schema
-type Post struct {
+type Order struct {
     ent.Schema
 }
 
-func (Post) Fields() []ent.Field {
+func (Order) Fields() []ent.Field {
     return []ent.Field{
         field.Int("id").
-            Positive().
             Immutable().
             Annotations(
                 entgql.OrderField("ID"),
             ),
-        field.String("title").
-            NotEmpty().
-            Annotations(
-                entgql.OrderField("TITLE"),
-            ),
-        field.Text("content").
-            NotEmpty(),
-        field.Time("created_at").
-            Default(time.Now).
-            Immutable().
-            Annotations(
-                entgql.OrderField("CREATED_AT"),
-            ),
-        field.Time("updated_at").
-            Default(time.Now).
-            UpdateDefault(time.Now).
-            Annotations(
-                entgql.OrderField("UPDATED_AT"),
-            ),
-        field.String("status").
-            GoType(Status("")).
-            Default(string(StatusDraft)).
+        field.Enum("status").
+            Values("pending", "completed", "cancelled").
+            Default("pending").
             Annotations(
                 entgql.OrderField("STATUS"),
             ),
-    }
-}
-
-func (Post) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.From("authors", User.Type).
-            Ref("authored_posts").
-            Through("user_posts", UserPost.Type).
-            Annotations(entgql.RelayConnection()),
-        edge.To("comments", Comment.Type).
-            Annotations(entgql.RelayConnection()),
-        edge.From("liked_by", User.Type).
-            Ref("likes").
-            Through("user_likes", UserLike.Type).
-            Annotations(entgql.RelayConnection()),
-    }
-}
-
-func (Post) Annotations() []schema.Annotation {
-    return []schema.Annotation{
-        entgql.QueryField(),
-        entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-        entgql.RelayConnection(),
-    }
-}
-
-// UserPost schema
-type UserPost struct {
-    ent.Schema
-}
-
-func (UserPost) Fields() []ent.Field {
-    return []ent.Field{
-        field.Int("user_id").
-            Positive(),
-        field.Int("post_id").
-            Positive(),
-        field.Time("created_at").
-            Default(time.Now).
-            Immutable().
-            Annotations(
-                entgql.OrderField("CREATED_AT"),
-            ),
-        field.String("role").
-            GoType(Role("")).
-            Default(string(RoleAuthor)).
-            Annotations(
-                entgql.OrderField("ROLE"),
-            ),
-    }
-}
-
-func (UserPost) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.To("user", User.Type).
-            Unique().
-            Required().
-            Field("user_id"),
-        edge.To("post", Post.Type).
-            Unique().
-            Required().
-            Field("post_id"),
-    }
-}
-
-func (UserPost) Annotations() []schema.Annotation {
-    return []schema.Annotation{
-        entgql.QueryField(),
-        entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-    }
-}
-
-// Comment schema
-type Comment struct {
-    ent.Schema
-}
-
-func (Comment) Fields() []ent.Field {
-    return []ent.Field{
-        field.Int("id").
+        field.Float("total").
             Positive().
-            Immutable().
             Annotations(
-                entgql.OrderField("ID"),
-            ),
-        field.Text("content").
-            NotEmpty().
-            Annotations(
-                entgql.OrderField("CONTENT"),
+                entgql.OrderField("TOTAL"),
             ),
         field.Time("created_at").
             Default(time.Now).
@@ -246,70 +137,19 @@ func (Comment) Fields() []ent.Field {
     }
 }
 
-func (Comment) Edges() []ent.Edge {
+func (Order) Edges() []ent.Edge {
     return []ent.Edge{
-        edge.From("author", User.Type).
-            Ref("comments").
-            Unique().
-            Required(),
-        edge.From("post", Post.Type).
-            Ref("comments").
-            Unique().
-            Required(),
+        edge.From("user", User.Type).
+            Ref("orders").
+            Unique(),
     }
 }
 
-func (Comment) Annotations() []schema.Annotation {
+func (Order) Annotations() []schema.Annotation {
     return []schema.Annotation{
-        entgql.QueryField(),
-        entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
         entgql.RelayConnection(),
-    }
-}
-
-// UserLike schema
-type UserLike struct {
-    ent.Schema
-}
-
-func (UserLike) Fields() []ent.Field {
-    return []ent.Field{
-        field.Int("id").
-            Positive().
-            Immutable().
-            Annotations(
-                entgql.OrderField("ID"),
-            ),
-        field.Int("user_id").
-            Positive(),
-        field.Int("post_id").
-            Positive(),
-        field.Time("created_at").
-            Default(time.Now).
-            Immutable().
-            Annotations(
-                entgql.OrderField("CREATED_AT"),
-            ),
-    }
-}
-
-func (UserLike) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.To("user", User.Type).
-            Unique().
-            Required().
-            Field("user_id"),
-        edge.To("post", Post.Type).
-            Unique().
-            Required().
-            Field("post_id"),
-    }
-}
-
-func (UserLike) Annotations() []schema.Annotation {
-    return []schema.Annotation{
-        entgql.QueryField(),
+        entgql.QueryField().Description("This is the order item"),
         entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-        entgql.RelayConnection(),
+        entgql.MultiOrder(),
     }
 }

@@ -4,34 +4,40 @@ schema:
 
 # resolver reports where the resolver implementations go.
 resolver:
-  layout: single-file
-  dir: .
-  filename: cgfx/gql/resolver.go
-  package: gql
+  layout: follow-schema
+  preserve_resolver: false
+  dir: cgfx/gql
 
-# gqlgen will search for any type names in the schema in these go packages
-# if they match it will use them, otherwise it will generate them.
+# gqlgen will search for any type names in the schema in these Go packages.
+# If they match, it will use them; otherwise, it will generate them.
 
 # autobind tells gqlgen to search for any type names in the GraphQL schema in the
-# provided package. If they match it will use them, otherwise it will generate new.
+# provided package. If they match, it will use them; otherwise, it will generate new ones.
 autobind:
-- products/cgfx/ent/gen
-- products/cgfx/ent/gen/comment
-- products/cgfx/ent/gen/user
-- products/cgfx/ent/gen/userlike
-- products/cgfx/ent/gen/userpost
+  - github.com/99designs/gqlgen/graphql/introspection
+  - products/cgfx/ent/gen
+  - products/cgfx/ent/gen/user
+  - products/cgfx/ent/gen/order
 
 # This section declares type mapping between the GraphQL and Go type systems.
 models:
-  # Defines the ID field as Go 'int'.
-  ID:
+  # Defines the ID field as Go 'UUID'.
+  UUID:
     model:
-      - github.com/99designs/gqlgen/graphql.IntID
+      - products/cgfx/ent/schema/uuidgql.UUID
   Node:
     model:
       - products/cgfx/ent/gen.Noder
-
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.IntID
+  Uint64:
+    model:
+      - github.com/99designs/gqlgen/graphql.Uint64
 # Specifies where to generate the code
 exec:
   filename: cgfx/gql/generated.go
+  package: gql
+model:
+  filename: cgfx/gql/models_gen.go
   package: gql

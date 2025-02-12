@@ -6,11 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"products/cgfx/ent/gen/comment"
-	"products/cgfx/ent/gen/post"
+	"products/cgfx/ent/gen/order"
 	"products/cgfx/ent/gen/user"
-	"products/cgfx/ent/gen/userlike"
-	"products/cgfx/ent/gen/userpost"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,6 +19,18 @@ type UserCreate struct {
 	config
 	mutation *UserMutation
 	hooks    []Hook
+}
+
+// SetFirstname sets the "firstname" field.
+func (uc *UserCreate) SetFirstname(s string) *UserCreate {
+	uc.mutation.SetFirstname(s)
+	return uc
+}
+
+// SetLastname sets the "lastname" field.
+func (uc *UserCreate) SetLastname(s string) *UserCreate {
+	uc.mutation.SetLastname(s)
+	return uc
 }
 
 // SetUsername sets the "username" field.
@@ -70,99 +79,25 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
-// SetIsActive sets the "is_active" field.
-func (uc *UserCreate) SetIsActive(b bool) *UserCreate {
-	uc.mutation.SetIsActive(b)
-	return uc
-}
-
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (uc *UserCreate) SetNillableIsActive(b *bool) *UserCreate {
-	if b != nil {
-		uc.SetIsActive(*b)
-	}
-	return uc
-}
-
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(i int) *UserCreate {
 	uc.mutation.SetID(i)
 	return uc
 }
 
-// AddAuthoredPostIDs adds the "authored_posts" edge to the Post entity by IDs.
-func (uc *UserCreate) AddAuthoredPostIDs(ids ...int) *UserCreate {
-	uc.mutation.AddAuthoredPostIDs(ids...)
+// AddOrderIDs adds the "orders" edge to the Order entity by IDs.
+func (uc *UserCreate) AddOrderIDs(ids ...int) *UserCreate {
+	uc.mutation.AddOrderIDs(ids...)
 	return uc
 }
 
-// AddAuthoredPosts adds the "authored_posts" edges to the Post entity.
-func (uc *UserCreate) AddAuthoredPosts(p ...*Post) *UserCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// AddOrders adds the "orders" edges to the Order entity.
+func (uc *UserCreate) AddOrders(o ...*Order) *UserCreate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
 	}
-	return uc.AddAuthoredPostIDs(ids...)
-}
-
-// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
-func (uc *UserCreate) AddCommentIDs(ids ...int) *UserCreate {
-	uc.mutation.AddCommentIDs(ids...)
-	return uc
-}
-
-// AddComments adds the "comments" edges to the Comment entity.
-func (uc *UserCreate) AddComments(c ...*Comment) *UserCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return uc.AddCommentIDs(ids...)
-}
-
-// AddLikeIDs adds the "likes" edge to the Post entity by IDs.
-func (uc *UserCreate) AddLikeIDs(ids ...int) *UserCreate {
-	uc.mutation.AddLikeIDs(ids...)
-	return uc
-}
-
-// AddLikes adds the "likes" edges to the Post entity.
-func (uc *UserCreate) AddLikes(p ...*Post) *UserCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uc.AddLikeIDs(ids...)
-}
-
-// AddUserPostIDs adds the "user_posts" edge to the UserPost entity by IDs.
-func (uc *UserCreate) AddUserPostIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserPostIDs(ids...)
-	return uc
-}
-
-// AddUserPosts adds the "user_posts" edges to the UserPost entity.
-func (uc *UserCreate) AddUserPosts(u ...*UserPost) *UserCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return uc.AddUserPostIDs(ids...)
-}
-
-// AddUserLikeIDs adds the "user_likes" edge to the UserLike entity by IDs.
-func (uc *UserCreate) AddUserLikeIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserLikeIDs(ids...)
-	return uc
-}
-
-// AddUserLikes adds the "user_likes" edges to the UserLike entity.
-func (uc *UserCreate) AddUserLikes(u ...*UserLike) *UserCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return uc.AddUserLikeIDs(ids...)
+	return uc.AddOrderIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -208,14 +143,26 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultUpdatedAt()
 		uc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := uc.mutation.IsActive(); !ok {
-		v := user.DefaultIsActive
-		uc.mutation.SetIsActive(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
+	if _, ok := uc.mutation.Firstname(); !ok {
+		return &ValidationError{Name: "firstname", err: errors.New(`gen: missing required field "User.firstname"`)}
+	}
+	if v, ok := uc.mutation.Firstname(); ok {
+		if err := user.FirstnameValidator(v); err != nil {
+			return &ValidationError{Name: "firstname", err: fmt.Errorf(`gen: validator failed for field "User.firstname": %w`, err)}
+		}
+	}
+	if _, ok := uc.mutation.Lastname(); !ok {
+		return &ValidationError{Name: "lastname", err: errors.New(`gen: missing required field "User.lastname"`)}
+	}
+	if v, ok := uc.mutation.Lastname(); ok {
+		if err := user.LastnameValidator(v); err != nil {
+			return &ValidationError{Name: "lastname", err: fmt.Errorf(`gen: validator failed for field "User.lastname": %w`, err)}
+		}
+	}
 	if _, ok := uc.mutation.Username(); !ok {
 		return &ValidationError{Name: "username", err: errors.New(`gen: missing required field "User.username"`)}
 	}
@@ -245,14 +192,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`gen: missing required field "User.updated_at"`)}
-	}
-	if _, ok := uc.mutation.IsActive(); !ok {
-		return &ValidationError{Name: "is_active", err: errors.New(`gen: missing required field "User.is_active"`)}
-	}
-	if v, ok := uc.mutation.ID(); ok {
-		if err := user.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`gen: validator failed for field "User.id": %w`, err)}
-		}
 	}
 	return nil
 }
@@ -286,6 +225,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := uc.mutation.Firstname(); ok {
+		_spec.SetField(user.FieldFirstname, field.TypeString, value)
+		_node.Firstname = value
+	}
+	if value, ok := uc.mutation.Lastname(); ok {
+		_spec.SetField(user.FieldLastname, field.TypeString, value)
+		_node.Lastname = value
+	}
 	if value, ok := uc.mutation.Username(); ok {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
 		_node.Username = value
@@ -306,91 +253,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := uc.mutation.IsActive(); ok {
-		_spec.SetField(user.FieldIsActive, field.TypeBool, value)
-		_node.IsActive = value
-	}
-	if nodes := uc.mutation.AuthoredPostsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.AuthoredPostsTable,
-			Columns: user.AuthoredPostsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserPostCreate{config: uc.config, mutation: newUserPostMutation(uc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.CommentsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.OrdersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.CommentsTable,
-			Columns: []string{user.CommentsColumn},
+			Table:   user.OrdersTable,
+			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.LikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.LikesTable,
-			Columns: user.LikesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserLikeCreate{config: uc.config, mutation: newUserLikeMutation(uc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.UserPostsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   user.UserPostsTable,
-			Columns: []string{user.UserPostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userpost.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.UserLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   user.UserLikesTable,
-			Columns: []string{user.UserLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userlike.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

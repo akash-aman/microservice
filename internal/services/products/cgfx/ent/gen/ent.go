@@ -6,11 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"products/cgfx/ent/gen/comment"
-	"products/cgfx/ent/gen/post"
+	"products/cgfx/ent/gen/order"
 	"products/cgfx/ent/gen/user"
-	"products/cgfx/ent/gen/userlike"
-	"products/cgfx/ent/gen/userpost"
 	"reflect"
 	"sync"
 
@@ -77,11 +74,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			comment.Table:  comment.ValidColumn,
-			post.Table:     post.ValidColumn,
-			user.Table:     user.ValidColumn,
-			userlike.Table: userlike.ValidColumn,
-			userpost.Table: userpost.ValidColumn,
+			order.Table: order.ValidColumn,
+			user.Table:  user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

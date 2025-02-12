@@ -14,6 +14,10 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldFirstname holds the string denoting the firstname field in the database.
+	FieldFirstname = "firstname"
+	// FieldLastname holds the string denoting the lastname field in the database.
+	FieldLastname = "lastname"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldEmail holds the string denoting the email field in the database.
@@ -24,72 +28,30 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldIsActive holds the string denoting the is_active field in the database.
-	FieldIsActive = "is_active"
-	// EdgeAuthoredPosts holds the string denoting the authored_posts edge name in mutations.
-	EdgeAuthoredPosts = "authored_posts"
-	// EdgeComments holds the string denoting the comments edge name in mutations.
-	EdgeComments = "comments"
-	// EdgeLikes holds the string denoting the likes edge name in mutations.
-	EdgeLikes = "likes"
-	// EdgeUserPosts holds the string denoting the user_posts edge name in mutations.
-	EdgeUserPosts = "user_posts"
-	// EdgeUserLikes holds the string denoting the user_likes edge name in mutations.
-	EdgeUserLikes = "user_likes"
+	// EdgeOrders holds the string denoting the orders edge name in mutations.
+	EdgeOrders = "orders"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// AuthoredPostsTable is the table that holds the authored_posts relation/edge. The primary key declared below.
-	AuthoredPostsTable = "user_posts"
-	// AuthoredPostsInverseTable is the table name for the Post entity.
-	// It exists in this package in order to avoid circular dependency with the "post" package.
-	AuthoredPostsInverseTable = "posts"
-	// CommentsTable is the table that holds the comments relation/edge.
-	CommentsTable = "comments"
-	// CommentsInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	CommentsInverseTable = "comments"
-	// CommentsColumn is the table column denoting the comments relation/edge.
-	CommentsColumn = "user_comments"
-	// LikesTable is the table that holds the likes relation/edge. The primary key declared below.
-	LikesTable = "user_likes"
-	// LikesInverseTable is the table name for the Post entity.
-	// It exists in this package in order to avoid circular dependency with the "post" package.
-	LikesInverseTable = "posts"
-	// UserPostsTable is the table that holds the user_posts relation/edge.
-	UserPostsTable = "user_posts"
-	// UserPostsInverseTable is the table name for the UserPost entity.
-	// It exists in this package in order to avoid circular dependency with the "userpost" package.
-	UserPostsInverseTable = "user_posts"
-	// UserPostsColumn is the table column denoting the user_posts relation/edge.
-	UserPostsColumn = "user_id"
-	// UserLikesTable is the table that holds the user_likes relation/edge.
-	UserLikesTable = "user_likes"
-	// UserLikesInverseTable is the table name for the UserLike entity.
-	// It exists in this package in order to avoid circular dependency with the "userlike" package.
-	UserLikesInverseTable = "user_likes"
-	// UserLikesColumn is the table column denoting the user_likes relation/edge.
-	UserLikesColumn = "user_id"
+	// OrdersTable is the table that holds the orders relation/edge.
+	OrdersTable = "orders"
+	// OrdersInverseTable is the table name for the Order entity.
+	// It exists in this package in order to avoid circular dependency with the "order" package.
+	OrdersInverseTable = "orders"
+	// OrdersColumn is the table column denoting the orders relation/edge.
+	OrdersColumn = "user_orders"
 )
 
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
+	FieldFirstname,
+	FieldLastname,
 	FieldUsername,
 	FieldEmail,
 	FieldPasswordHash,
 	FieldCreatedAt,
 	FieldUpdatedAt,
-	FieldIsActive,
 }
-
-var (
-	// AuthoredPostsPrimaryKey and AuthoredPostsColumn2 are the table columns denoting the
-	// primary key for the authored_posts relation (M2M).
-	AuthoredPostsPrimaryKey = []string{"user_id", "post_id"}
-	// LikesPrimaryKey and LikesColumn2 are the table columns denoting the
-	// primary key for the likes relation (M2M).
-	LikesPrimaryKey = []string{"user_id", "post_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -102,6 +64,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// FirstnameValidator is a validator for the "firstname" field. It is called by the builders before save.
+	FirstnameValidator func(string) error
+	// LastnameValidator is a validator for the "lastname" field. It is called by the builders before save.
+	LastnameValidator func(string) error
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
@@ -114,10 +80,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultIsActive holds the default value on creation for the "is_active" field.
-	DefaultIsActive bool
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the User queries.
@@ -126,6 +88,16 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByFirstname orders the results by the firstname field.
+func ByFirstname(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstname, opts...).ToFunc()
+}
+
+// ByLastname orders the results by the lastname field.
+func ByLastname(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastname, opts...).ToFunc()
 }
 
 // ByUsername orders the results by the username field.
@@ -153,112 +125,23 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByIsActive orders the results by the is_active field.
-func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
-}
-
-// ByAuthoredPostsCount orders the results by authored_posts count.
-func ByAuthoredPostsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByOrdersCount orders the results by orders count.
+func ByOrdersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAuthoredPostsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newOrdersStep(), opts...)
 	}
 }
 
-// ByAuthoredPosts orders the results by authored_posts terms.
-func ByAuthoredPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByOrders orders the results by orders terms.
+func ByOrders(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAuthoredPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newOrdersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByCommentsCount orders the results by comments count.
-func ByCommentsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCommentsStep(), opts...)
-	}
-}
-
-// ByComments orders the results by comments terms.
-func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByLikesCount orders the results by likes count.
-func ByLikesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLikesStep(), opts...)
-	}
-}
-
-// ByLikes orders the results by likes terms.
-func ByLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByUserPostsCount orders the results by user_posts count.
-func ByUserPostsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserPostsStep(), opts...)
-	}
-}
-
-// ByUserPosts orders the results by user_posts terms.
-func ByUserPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByUserLikesCount orders the results by user_likes count.
-func ByUserLikesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserLikesStep(), opts...)
-	}
-}
-
-// ByUserLikes orders the results by user_likes terms.
-func ByUserLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newAuthoredPostsStep() *sqlgraph.Step {
+func newOrdersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AuthoredPostsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, AuthoredPostsTable, AuthoredPostsPrimaryKey...),
-	)
-}
-func newCommentsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CommentsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
-	)
-}
-func newLikesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(LikesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, LikesTable, LikesPrimaryKey...),
-	)
-}
-func newUserPostsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserPostsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserPostsTable, UserPostsColumn),
-	)
-}
-func newUserLikesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserLikesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserLikesTable, UserLikesColumn),
+		sqlgraph.To(OrdersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OrdersTable, OrdersColumn),
 	)
 }

@@ -8,250 +8,31 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (c *Comment) Author(ctx context.Context) (*User, error) {
-	result, err := c.Edges.AuthorOrErr()
+func (o *Order) User(ctx context.Context) (*User, error) {
+	result, err := o.Edges.UserOrErr()
 	if IsNotLoaded(err) {
-		result, err = c.QueryAuthor().Only(ctx)
+		result, err = o.QueryUser().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
-func (c *Comment) Post(ctx context.Context) (*Post, error) {
-	result, err := c.Edges.PostOrErr()
-	if IsNotLoaded(err) {
-		result, err = c.QueryPost().Only(ctx)
-	}
-	return result, err
-}
-
-func (po *Post) Authors(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserOrder,
-) (*UserConnection, error) {
-	opts := []UserPaginateOption{
-		WithUserOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := po.Edges.totalCount[0][alias]
-	if nodes, err := po.NamedAuthors(alias); err == nil || hasTotalCount {
-		pager, err := newUserPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserConnection{Edges: []*UserEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return po.QueryAuthors().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (po *Post) Comments(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *CommentOrder,
-) (*CommentConnection, error) {
-	opts := []CommentPaginateOption{
-		WithCommentOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := po.Edges.totalCount[1][alias]
-	if nodes, err := po.NamedComments(alias); err == nil || hasTotalCount {
-		pager, err := newCommentPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &CommentConnection{Edges: []*CommentEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return po.QueryComments().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (po *Post) LikedBy(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserOrder,
-) (*UserConnection, error) {
-	opts := []UserPaginateOption{
-		WithUserOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := po.Edges.totalCount[2][alias]
-	if nodes, err := po.NamedLikedBy(alias); err == nil || hasTotalCount {
-		pager, err := newUserPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserConnection{Edges: []*UserEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return po.QueryLikedBy().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (po *Post) UserPosts(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserPostOrder,
-) (*UserPostConnection, error) {
-	opts := []UserPostPaginateOption{
-		WithUserPostOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := po.Edges.totalCount[3][alias]
-	if nodes, err := po.NamedUserPosts(alias); err == nil || hasTotalCount {
-		pager, err := newUserPostPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserPostConnection{Edges: []*UserPostEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return po.QueryUserPosts().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (po *Post) UserLikes(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserLikeOrder,
-) (*UserLikeConnection, error) {
-	opts := []UserLikePaginateOption{
-		WithUserLikeOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := po.Edges.totalCount[4][alias]
-	if nodes, err := po.NamedUserLikes(alias); err == nil || hasTotalCount {
-		pager, err := newUserLikePager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserLikeConnection{Edges: []*UserLikeEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return po.QueryUserLikes().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (u *User) AuthoredPosts(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *PostOrder,
-) (*PostConnection, error) {
-	opts := []PostPaginateOption{
-		WithPostOrder(orderBy),
+func (u *User) Orders(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy []*OrderOrder, where *OrderWhereInput,
+) (*OrderConnection, error) {
+	opts := []OrderPaginateOption{
+		WithOrderOrder(orderBy),
+		WithOrderFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
 	totalCount, hasTotalCount := u.Edges.totalCount[0][alias]
-	if nodes, err := u.NamedAuthoredPosts(alias); err == nil || hasTotalCount {
-		pager, err := newPostPager(opts, last != nil)
+	if nodes, err := u.NamedOrders(alias); err == nil || hasTotalCount {
+		pager, err := newOrderPager(opts, last != nil)
 		if err != nil {
 			return nil, err
 		}
-		conn := &PostConnection{Edges: []*PostEdge{}, TotalCount: totalCount}
+		conn := &OrderConnection{Edges: []*OrderEdge{}, TotalCount: totalCount}
 		conn.build(nodes, pager, after, first, before, last)
 		return conn, nil
 	}
-	return u.QueryAuthoredPosts().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (u *User) Comments(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *CommentOrder,
-) (*CommentConnection, error) {
-	opts := []CommentPaginateOption{
-		WithCommentOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := u.Edges.totalCount[1][alias]
-	if nodes, err := u.NamedComments(alias); err == nil || hasTotalCount {
-		pager, err := newCommentPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &CommentConnection{Edges: []*CommentEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return u.QueryComments().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (u *User) Likes(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *PostOrder,
-) (*PostConnection, error) {
-	opts := []PostPaginateOption{
-		WithPostOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := u.Edges.totalCount[2][alias]
-	if nodes, err := u.NamedLikes(alias); err == nil || hasTotalCount {
-		pager, err := newPostPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &PostConnection{Edges: []*PostEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return u.QueryLikes().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (u *User) UserPosts(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserPostOrder,
-) (*UserPostConnection, error) {
-	opts := []UserPostPaginateOption{
-		WithUserPostOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := u.Edges.totalCount[3][alias]
-	if nodes, err := u.NamedUserPosts(alias); err == nil || hasTotalCount {
-		pager, err := newUserPostPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserPostConnection{Edges: []*UserPostEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return u.QueryUserPosts().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (u *User) UserLikes(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserLikeOrder,
-) (*UserLikeConnection, error) {
-	opts := []UserLikePaginateOption{
-		WithUserLikeOrder(orderBy),
-	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := u.Edges.totalCount[4][alias]
-	if nodes, err := u.NamedUserLikes(alias); err == nil || hasTotalCount {
-		pager, err := newUserLikePager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserLikeConnection{Edges: []*UserLikeEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
-	}
-	return u.QueryUserLikes().Paginate(ctx, after, first, before, last, opts...)
-}
-
-func (ul *UserLike) User(ctx context.Context) (*User, error) {
-	result, err := ul.Edges.UserOrErr()
-	if IsNotLoaded(err) {
-		result, err = ul.QueryUser().Only(ctx)
-	}
-	return result, err
-}
-
-func (ul *UserLike) Post(ctx context.Context) (*Post, error) {
-	result, err := ul.Edges.PostOrErr()
-	if IsNotLoaded(err) {
-		result, err = ul.QueryPost().Only(ctx)
-	}
-	return result, err
-}
-
-func (up *UserPost) User(ctx context.Context) (*User, error) {
-	result, err := up.Edges.UserOrErr()
-	if IsNotLoaded(err) {
-		result, err = up.QueryUser().Only(ctx)
-	}
-	return result, err
-}
-
-func (up *UserPost) Post(ctx context.Context) (*Post, error) {
-	result, err := up.Edges.PostOrErr()
-	if IsNotLoaded(err) {
-		result, err = up.QueryPost().Only(ctx)
-	}
-	return result, err
+	return u.QueryOrders().Paginate(ctx, after, first, before, last, opts...)
 }

@@ -55,6 +55,16 @@ func IDLTE(id int) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldID, id))
 }
 
+// Firstname applies equality check predicate on the "firstname" field. It's identical to FirstnameEQ.
+func Firstname(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldFirstname, v))
+}
+
+// Lastname applies equality check predicate on the "lastname" field. It's identical to LastnameEQ.
+func Lastname(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldLastname, v))
+}
+
 // Username applies equality check predicate on the "username" field. It's identical to UsernameEQ.
 func Username(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldUsername, v))
@@ -80,9 +90,134 @@ func UpdatedAt(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// IsActive applies equality check predicate on the "is_active" field. It's identical to IsActiveEQ.
-func IsActive(v bool) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldIsActive, v))
+// FirstnameEQ applies the EQ predicate on the "firstname" field.
+func FirstnameEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldFirstname, v))
+}
+
+// FirstnameNEQ applies the NEQ predicate on the "firstname" field.
+func FirstnameNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldFirstname, v))
+}
+
+// FirstnameIn applies the In predicate on the "firstname" field.
+func FirstnameIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldFirstname, vs...))
+}
+
+// FirstnameNotIn applies the NotIn predicate on the "firstname" field.
+func FirstnameNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldFirstname, vs...))
+}
+
+// FirstnameGT applies the GT predicate on the "firstname" field.
+func FirstnameGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldFirstname, v))
+}
+
+// FirstnameGTE applies the GTE predicate on the "firstname" field.
+func FirstnameGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldFirstname, v))
+}
+
+// FirstnameLT applies the LT predicate on the "firstname" field.
+func FirstnameLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldFirstname, v))
+}
+
+// FirstnameLTE applies the LTE predicate on the "firstname" field.
+func FirstnameLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldFirstname, v))
+}
+
+// FirstnameContains applies the Contains predicate on the "firstname" field.
+func FirstnameContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldFirstname, v))
+}
+
+// FirstnameHasPrefix applies the HasPrefix predicate on the "firstname" field.
+func FirstnameHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldFirstname, v))
+}
+
+// FirstnameHasSuffix applies the HasSuffix predicate on the "firstname" field.
+func FirstnameHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldFirstname, v))
+}
+
+// FirstnameEqualFold applies the EqualFold predicate on the "firstname" field.
+func FirstnameEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldFirstname, v))
+}
+
+// FirstnameContainsFold applies the ContainsFold predicate on the "firstname" field.
+func FirstnameContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldFirstname, v))
+}
+
+// LastnameEQ applies the EQ predicate on the "lastname" field.
+func LastnameEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldLastname, v))
+}
+
+// LastnameNEQ applies the NEQ predicate on the "lastname" field.
+func LastnameNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldLastname, v))
+}
+
+// LastnameIn applies the In predicate on the "lastname" field.
+func LastnameIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldLastname, vs...))
+}
+
+// LastnameNotIn applies the NotIn predicate on the "lastname" field.
+func LastnameNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldLastname, vs...))
+}
+
+// LastnameGT applies the GT predicate on the "lastname" field.
+func LastnameGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldLastname, v))
+}
+
+// LastnameGTE applies the GTE predicate on the "lastname" field.
+func LastnameGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldLastname, v))
+}
+
+// LastnameLT applies the LT predicate on the "lastname" field.
+func LastnameLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldLastname, v))
+}
+
+// LastnameLTE applies the LTE predicate on the "lastname" field.
+func LastnameLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldLastname, v))
+}
+
+// LastnameContains applies the Contains predicate on the "lastname" field.
+func LastnameContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldLastname, v))
+}
+
+// LastnameHasPrefix applies the HasPrefix predicate on the "lastname" field.
+func LastnameHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldLastname, v))
+}
+
+// LastnameHasSuffix applies the HasSuffix predicate on the "lastname" field.
+func LastnameHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldLastname, v))
+}
+
+// LastnameEqualFold applies the EqualFold predicate on the "lastname" field.
+func LastnameEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldLastname, v))
+}
+
+// LastnameContainsFold applies the ContainsFold predicate on the "lastname" field.
+func LastnameContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldLastname, v))
 }
 
 // UsernameEQ applies the EQ predicate on the "username" field.
@@ -360,123 +495,21 @@ func UpdatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// IsActiveEQ applies the EQ predicate on the "is_active" field.
-func IsActiveEQ(v bool) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldIsActive, v))
-}
-
-// IsActiveNEQ applies the NEQ predicate on the "is_active" field.
-func IsActiveNEQ(v bool) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldIsActive, v))
-}
-
-// HasAuthoredPosts applies the HasEdge predicate on the "authored_posts" edge.
-func HasAuthoredPosts() predicate.User {
+// HasOrders applies the HasEdge predicate on the "orders" edge.
+func HasOrders() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, AuthoredPostsTable, AuthoredPostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, OrdersTable, OrdersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasAuthoredPostsWith applies the HasEdge predicate on the "authored_posts" edge with a given conditions (other predicates).
-func HasAuthoredPostsWith(preds ...predicate.Post) predicate.User {
+// HasOrdersWith applies the HasEdge predicate on the "orders" edge with a given conditions (other predicates).
+func HasOrdersWith(preds ...predicate.Order) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newAuthoredPostsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasComments applies the HasEdge predicate on the "comments" edge.
-func HasComments() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCommentsWith applies the HasEdge predicate on the "comments" edge with a given conditions (other predicates).
-func HasCommentsWith(preds ...predicate.Comment) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newCommentsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasLikes applies the HasEdge predicate on the "likes" edge.
-func HasLikes() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, LikesTable, LikesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasLikesWith applies the HasEdge predicate on the "likes" edge with a given conditions (other predicates).
-func HasLikesWith(preds ...predicate.Post) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newLikesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasUserPosts applies the HasEdge predicate on the "user_posts" edge.
-func HasUserPosts() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserPostsTable, UserPostsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserPostsWith applies the HasEdge predicate on the "user_posts" edge with a given conditions (other predicates).
-func HasUserPostsWith(preds ...predicate.UserPost) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newUserPostsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasUserLikes applies the HasEdge predicate on the "user_likes" edge.
-func HasUserLikes() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserLikesTable, UserLikesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserLikesWith applies the HasEdge predicate on the "user_likes" edge with a given conditions (other predicates).
-func HasUserLikesWith(preds ...predicate.UserLike) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newUserLikesStep()
+		step := newOrdersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

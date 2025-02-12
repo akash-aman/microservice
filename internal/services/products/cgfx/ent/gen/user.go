@@ -17,6 +17,10 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Firstname holds the value of the "firstname" field.
+	Firstname string `json:"firstname,omitempty"`
+	// Lastname holds the value of the "lastname" field.
+	Lastname string `json:"lastname,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
 	// Email holds the value of the "email" field.
@@ -27,8 +31,6 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// IsActive holds the value of the "is_active" field.
-	IsActive bool `json:"is_active,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -37,72 +39,24 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// AuthoredPosts holds the value of the authored_posts edge.
-	AuthoredPosts []*Post `json:"authored_posts,omitempty"`
-	// Comments holds the value of the comments edge.
-	Comments []*Comment `json:"comments,omitempty"`
-	// Likes holds the value of the likes edge.
-	Likes []*Post `json:"likes,omitempty"`
-	// UserPosts holds the value of the user_posts edge.
-	UserPosts []*UserPost `json:"user_posts,omitempty"`
-	// UserLikes holds the value of the user_likes edge.
-	UserLikes []*UserLike `json:"user_likes,omitempty"`
+	// Orders holds the value of the orders edge.
+	Orders []*Order `json:"orders,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [5]map[string]int
+	totalCount [1]map[string]int
 
-	namedAuthoredPosts map[string][]*Post
-	namedComments      map[string][]*Comment
-	namedLikes         map[string][]*Post
-	namedUserPosts     map[string][]*UserPost
-	namedUserLikes     map[string][]*UserLike
+	namedOrders map[string][]*Order
 }
 
-// AuthoredPostsOrErr returns the AuthoredPosts value or an error if the edge
+// OrdersOrErr returns the Orders value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) AuthoredPostsOrErr() ([]*Post, error) {
+func (e UserEdges) OrdersOrErr() ([]*Order, error) {
 	if e.loadedTypes[0] {
-		return e.AuthoredPosts, nil
+		return e.Orders, nil
 	}
-	return nil, &NotLoadedError{edge: "authored_posts"}
-}
-
-// CommentsOrErr returns the Comments value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) CommentsOrErr() ([]*Comment, error) {
-	if e.loadedTypes[1] {
-		return e.Comments, nil
-	}
-	return nil, &NotLoadedError{edge: "comments"}
-}
-
-// LikesOrErr returns the Likes value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) LikesOrErr() ([]*Post, error) {
-	if e.loadedTypes[2] {
-		return e.Likes, nil
-	}
-	return nil, &NotLoadedError{edge: "likes"}
-}
-
-// UserPostsOrErr returns the UserPosts value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UserPostsOrErr() ([]*UserPost, error) {
-	if e.loadedTypes[3] {
-		return e.UserPosts, nil
-	}
-	return nil, &NotLoadedError{edge: "user_posts"}
-}
-
-// UserLikesOrErr returns the UserLikes value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UserLikesOrErr() ([]*UserLike, error) {
-	if e.loadedTypes[4] {
-		return e.UserLikes, nil
-	}
-	return nil, &NotLoadedError{edge: "user_likes"}
+	return nil, &NotLoadedError{edge: "orders"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -110,11 +64,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldIsActive:
-			values[i] = new(sql.NullBool)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldEmail, user.FieldPasswordHash:
+		case user.FieldFirstname, user.FieldLastname, user.FieldUsername, user.FieldEmail, user.FieldPasswordHash:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -139,6 +91,18 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			u.ID = int(value.Int64)
+		case user.FieldFirstname:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field firstname", values[i])
+			} else if value.Valid {
+				u.Firstname = value.String
+			}
+		case user.FieldLastname:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field lastname", values[i])
+			} else if value.Valid {
+				u.Lastname = value.String
+			}
 		case user.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
@@ -169,12 +133,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.UpdatedAt = value.Time
 			}
-		case user.FieldIsActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_active", values[i])
-			} else if value.Valid {
-				u.IsActive = value.Bool
-			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -188,29 +146,9 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryAuthoredPosts queries the "authored_posts" edge of the User entity.
-func (u *User) QueryAuthoredPosts() *PostQuery {
-	return NewUserClient(u.config).QueryAuthoredPosts(u)
-}
-
-// QueryComments queries the "comments" edge of the User entity.
-func (u *User) QueryComments() *CommentQuery {
-	return NewUserClient(u.config).QueryComments(u)
-}
-
-// QueryLikes queries the "likes" edge of the User entity.
-func (u *User) QueryLikes() *PostQuery {
-	return NewUserClient(u.config).QueryLikes(u)
-}
-
-// QueryUserPosts queries the "user_posts" edge of the User entity.
-func (u *User) QueryUserPosts() *UserPostQuery {
-	return NewUserClient(u.config).QueryUserPosts(u)
-}
-
-// QueryUserLikes queries the "user_likes" edge of the User entity.
-func (u *User) QueryUserLikes() *UserLikeQuery {
-	return NewUserClient(u.config).QueryUserLikes(u)
+// QueryOrders queries the "orders" edge of the User entity.
+func (u *User) QueryOrders() *OrderQuery {
+	return NewUserClient(u.config).QueryOrders(u)
 }
 
 // Update returns a builder for updating this User.
@@ -236,6 +174,12 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
+	builder.WriteString("firstname=")
+	builder.WriteString(u.Firstname)
+	builder.WriteString(", ")
+	builder.WriteString("lastname=")
+	builder.WriteString(u.Lastname)
+	builder.WriteString(", ")
 	builder.WriteString("username=")
 	builder.WriteString(u.Username)
 	builder.WriteString(", ")
@@ -249,130 +193,31 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("is_active=")
-	builder.WriteString(fmt.Sprintf("%v", u.IsActive))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// NamedAuthoredPosts returns the AuthoredPosts named value or an error if the edge was not
+// NamedOrders returns the Orders named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (u *User) NamedAuthoredPosts(name string) ([]*Post, error) {
-	if u.Edges.namedAuthoredPosts == nil {
+func (u *User) NamedOrders(name string) ([]*Order, error) {
+	if u.Edges.namedOrders == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := u.Edges.namedAuthoredPosts[name]
+	nodes, ok := u.Edges.namedOrders[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (u *User) appendNamedAuthoredPosts(name string, edges ...*Post) {
-	if u.Edges.namedAuthoredPosts == nil {
-		u.Edges.namedAuthoredPosts = make(map[string][]*Post)
+func (u *User) appendNamedOrders(name string, edges ...*Order) {
+	if u.Edges.namedOrders == nil {
+		u.Edges.namedOrders = make(map[string][]*Order)
 	}
 	if len(edges) == 0 {
-		u.Edges.namedAuthoredPosts[name] = []*Post{}
+		u.Edges.namedOrders[name] = []*Order{}
 	} else {
-		u.Edges.namedAuthoredPosts[name] = append(u.Edges.namedAuthoredPosts[name], edges...)
-	}
-}
-
-// NamedComments returns the Comments named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedComments(name string) ([]*Comment, error) {
-	if u.Edges.namedComments == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedComments[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedComments(name string, edges ...*Comment) {
-	if u.Edges.namedComments == nil {
-		u.Edges.namedComments = make(map[string][]*Comment)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedComments[name] = []*Comment{}
-	} else {
-		u.Edges.namedComments[name] = append(u.Edges.namedComments[name], edges...)
-	}
-}
-
-// NamedLikes returns the Likes named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedLikes(name string) ([]*Post, error) {
-	if u.Edges.namedLikes == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedLikes[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedLikes(name string, edges ...*Post) {
-	if u.Edges.namedLikes == nil {
-		u.Edges.namedLikes = make(map[string][]*Post)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedLikes[name] = []*Post{}
-	} else {
-		u.Edges.namedLikes[name] = append(u.Edges.namedLikes[name], edges...)
-	}
-}
-
-// NamedUserPosts returns the UserPosts named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedUserPosts(name string) ([]*UserPost, error) {
-	if u.Edges.namedUserPosts == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedUserPosts[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedUserPosts(name string, edges ...*UserPost) {
-	if u.Edges.namedUserPosts == nil {
-		u.Edges.namedUserPosts = make(map[string][]*UserPost)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedUserPosts[name] = []*UserPost{}
-	} else {
-		u.Edges.namedUserPosts[name] = append(u.Edges.namedUserPosts[name], edges...)
-	}
-}
-
-// NamedUserLikes returns the UserLikes named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (u *User) NamedUserLikes(name string) ([]*UserLike, error) {
-	if u.Edges.namedUserLikes == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := u.Edges.namedUserLikes[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (u *User) appendNamedUserLikes(name string, edges ...*UserLike) {
-	if u.Edges.namedUserLikes == nil {
-		u.Edges.namedUserLikes = make(map[string][]*UserLike)
-	}
-	if len(edges) == 0 {
-		u.Edges.namedUserLikes[name] = []*UserLike{}
-	} else {
-		u.Edges.namedUserLikes[name] = append(u.Edges.namedUserLikes[name], edges...)
+		u.Edges.namedOrders[name] = append(u.Edges.namedOrders[name], edges...)
 	}
 }
 

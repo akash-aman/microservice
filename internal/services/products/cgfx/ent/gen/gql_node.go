@@ -5,11 +5,8 @@ package gen
 import (
 	"context"
 	"fmt"
-	"products/cgfx/ent/gen/comment"
-	"products/cgfx/ent/gen/post"
+	"products/cgfx/ent/gen/order"
 	"products/cgfx/ent/gen/user"
-	"products/cgfx/ent/gen/userlike"
-	"products/cgfx/ent/gen/userpost"
 	"sync"
 	"sync/atomic"
 
@@ -27,30 +24,15 @@ type Noder interface {
 	IsNode()
 }
 
-var commentImplementors = []string{"Comment", "Node"}
+var orderImplementors = []string{"Order", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (*Comment) IsNode() {}
-
-var postImplementors = []string{"Post", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*Post) IsNode() {}
+func (*Order) IsNode() {}
 
 var userImplementors = []string{"User", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*User) IsNode() {}
-
-var userlikeImplementors = []string{"UserLike", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*UserLike) IsNode() {}
-
-var userpostImplementors = []string{"UserPost", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*UserPost) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -110,20 +92,11 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
-	case comment.Table:
-		query := c.Comment.Query().
-			Where(comment.ID(id))
+	case order.Table:
+		query := c.Order.Query().
+			Where(order.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, commentImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case post.Table:
-		query := c.Post.Query().
-			Where(post.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, postImplementors...); err != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, orderImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -133,24 +106,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			Where(user.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, userImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case userlike.Table:
-		query := c.UserLike.Query().
-			Where(userlike.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, userlikeImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(ctx)
-	case userpost.Table:
-		query := c.UserPost.Query().
-			Where(userpost.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, userpostImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -228,26 +183,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
-	case comment.Table:
-		query := c.Comment.Query().
-			Where(comment.IDIn(ids...))
-		query, err := query.CollectFields(ctx, commentImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case post.Table:
-		query := c.Post.Query().
-			Where(post.IDIn(ids...))
-		query, err := query.CollectFields(ctx, postImplementors...)
+	case order.Table:
+		query := c.Order.Query().
+			Where(order.IDIn(ids...))
+		query, err := query.CollectFields(ctx, orderImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -264,38 +203,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.User.Query().
 			Where(user.IDIn(ids...))
 		query, err := query.CollectFields(ctx, userImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case userlike.Table:
-		query := c.UserLike.Query().
-			Where(userlike.IDIn(ids...))
-		query, err := query.CollectFields(ctx, userlikeImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case userpost.Table:
-		query := c.UserPost.Query().
-			Where(userpost.IDIn(ids...))
-		query, err := query.CollectFields(ctx, userpostImplementors...)
 		if err != nil {
 			return nil, err
 		}

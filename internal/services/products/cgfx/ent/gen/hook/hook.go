@@ -8,28 +8,16 @@ import (
 	"products/cgfx/ent/gen"
 )
 
-// The CommentFunc type is an adapter to allow the use of ordinary
-// function as Comment mutator.
-type CommentFunc func(context.Context, *gen.CommentMutation) (gen.Value, error)
+// The OrderFunc type is an adapter to allow the use of ordinary
+// function as Order mutator.
+type OrderFunc func(context.Context, *gen.OrderMutation) (gen.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CommentFunc) Mutate(ctx context.Context, m gen.Mutation) (gen.Value, error) {
-	if mv, ok := m.(*gen.CommentMutation); ok {
+func (f OrderFunc) Mutate(ctx context.Context, m gen.Mutation) (gen.Value, error) {
+	if mv, ok := m.(*gen.OrderMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *gen.CommentMutation", m)
-}
-
-// The PostFunc type is an adapter to allow the use of ordinary
-// function as Post mutator.
-type PostFunc func(context.Context, *gen.PostMutation) (gen.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f PostFunc) Mutate(ctx context.Context, m gen.Mutation) (gen.Value, error) {
-	if mv, ok := m.(*gen.PostMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *gen.PostMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *gen.OrderMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary
@@ -42,30 +30,6 @@ func (f UserFunc) Mutate(ctx context.Context, m gen.Mutation) (gen.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *gen.UserMutation", m)
-}
-
-// The UserLikeFunc type is an adapter to allow the use of ordinary
-// function as UserLike mutator.
-type UserLikeFunc func(context.Context, *gen.UserLikeMutation) (gen.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserLikeFunc) Mutate(ctx context.Context, m gen.Mutation) (gen.Value, error) {
-	if mv, ok := m.(*gen.UserLikeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *gen.UserLikeMutation", m)
-}
-
-// The UserPostFunc type is an adapter to allow the use of ordinary
-// function as UserPost mutator.
-type UserPostFunc func(context.Context, *gen.UserPostMutation) (gen.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserPostFunc) Mutate(ctx context.Context, m gen.Mutation) (gen.Value, error) {
-	if mv, ok := m.(*gen.UserPostMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *gen.UserPostMutation", m)
 }
 
 // Condition is a hook condition function.

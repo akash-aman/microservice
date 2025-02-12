@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"pkg/http/server"
 	"pkg/logger"
-	"products/conf"
+	"products/app/inits"
 	"products/cgfx/ent/gen"
+	"products/conf"
 
 	// "entgo.io/contrib/entgql"
 	// "github.com/99designs/gqlgen/graphql/handler"
@@ -51,16 +52,9 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.IL
 				}
 			}()
 
-			// srv := handler.NewDefaultServer(generated.NewSchema(client))
-			// srv.Use(entgql.Transactioner{TxOpener: client})
-			// if cli.Debug {
-			// 	srv.Use(&debug.Tracer{})
-			// }
-
-			// http.Handle("/",
-			// 	playground.Handler("Todo", "/query"),
-			// )
-			// http.Handle("/query", srv)
+			go func() {
+				inits.InitGraphQLServer(client, log)
+			}()
 
 			return nil
 		},
