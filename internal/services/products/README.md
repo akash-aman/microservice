@@ -77,10 +77,11 @@ The following is the folder structure of the project:
 
 
 ```
-go run -mod=mod entgo.io/ent/cmd/ent generate --target ./ent/generated ./ent/schema
-go run -mod=mod entgo.io/contrib/entgql generate --target ./ent/generated ./ent/schema
+go run ./cgfx/ent/entc.go 
+go run ./cgfx/ent/gqlc.go 
 ```
-wa
+
 ```
-go run -mod=mod entgo.io/ent/cmd/ent describe ./ent/schema
+go get github.com/99designs/gqlgen
+go run github.com/99designs/gqlgen
 ```
