@@ -6,13 +6,20 @@ import (
 	"net/http"
 	"pkg/http/server"
 	"pkg/logger"
+	"products/app/inits"
+	"products/cgfx/ent/gen"
 	"products/conf"
 
+	// "entgo.io/contrib/entgql"
+	// "github.com/99designs/gqlgen/graphql/handler"
+	// "github.com/99designs/gqlgen/graphql/handler/debug"
+	// "github.com/99designs/gqlgen/graphql/playground"
 	"github.com/labstack/echo/v4"
+
 	"go.uber.org/fx"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.Config, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -35,6 +42,19 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, log logger.ILogger, config *conf.
 			e.GET("/", func(c echo.Context) error {
 				return c.String(http.StatusOK, config.Service.Name)
 			})
+
+			/**
+			 * Migration
+			 */
+			go func() {
+				if err := client.Schema.Create(ctx); err != nil {
+					log.Fatalf("failed creating schema resources: %v", err)
+				}
+			}()
+
+			go func() {
+				inits.InitGraphQLServer(client, log)
+			}()
 
 			return nil
 		},

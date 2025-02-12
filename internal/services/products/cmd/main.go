@@ -1,12 +1,14 @@
 package main
 
 import (
+	"pkg/db"
 	http "pkg/http"
 	httpServer "pkg/http/server"
 	"pkg/logger"
+	"products/app/inits"
 	"products/conf"
 	"products/server"
-	"products/app/inits"
+
 	"github.com/go-playground/validator"
 	"go.uber.org/fx"
 )
@@ -24,7 +26,9 @@ func main() {
 			conf.InitConfig,
 			http.NewContext,
 			validator.New,
+			db.NewConnectPool,
 			httpServer.NewEchoServer,
+			inits.NewEntClient,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),

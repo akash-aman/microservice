@@ -1,0 +1,56 @@
+2025-02-09T23:59:39.418+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 30559}
+2025-02-09T23:59:39.419+0530	info	logger/zap.go:61		{"pid": 30559, "value": ["HTTP server shutdown successfully"]}
+2025-02-09T23:59:39.419+0530	info	logger/zap.go:61		{"pid": 30559, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:06:20.522+0530	info	logger/zap.go:85	database connected successfully	{"pid": 63153}
+2025-02-12T22:07:09.197+0530	info	logger/zap.go:85	database connected successfully	{"pid": 64628}
+2025-02-12T22:09:49.806+0530	info	logger/zap.go:85	database connected successfully	{"pid": 69817}
+2025-02-12T22:09:49.807+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 69817}
+2025-02-12T22:09:49.837+0530	fatal	logger/zap.go:100	failed creating schema resources: sql/schema: modify "users" table: Error 3780 (HY000): Referencing column 'user_comments' and referenced column 'id' in foreign key constraint 'comments_users_comments' are incompatible.	{"pid": 69817}
+pkg/logger.(*zapLogger).Fatalf
+	/Users/workspace/GitHub/microservice/internal/pkg/logger/zap.go:100
+products/server.RunServers.func1.3
+	/Users/workspace/GitHub/microservice/internal/services/products/server/server.go:51
+2025-02-12T22:11:00.356+0530	info	logger/zap.go:85	database connected successfully	{"pid": 71849}
+2025-02-12T22:11:00.357+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 71849}
+2025-02-12T22:15:35.150+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 71849}
+2025-02-12T22:15:35.151+0530	info	logger/zap.go:61		{"pid": 71849, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:15:35.151+0530	info	logger/zap.go:61		{"pid": 71849, "value": ["HTTP server shutdown successfully"]}
+2025-02-12T22:48:57.709+0530	info	logger/zap.go:85	database connected successfully	{"pid": 46021}
+2025-02-12T22:48:57.710+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 46021}
+2025-02-12T22:48:57.731+0530	fatal	logger/zap.go:100	failed creating schema resources: sql/schema: modify "orders" table: Error 3780 (HY000): Referencing column 'user_orders' and referenced column 'id' in foreign key constraint 'orders_users_orders' are incompatible.	{"pid": 46021}
+pkg/logger.(*zapLogger).Fatalf
+	/Users/workspace/GitHub/microservice/internal/pkg/logger/zap.go:100
+products/server.RunServers.func1.3
+	/Users/workspace/GitHub/microservice/internal/services/products/server/server.go:51
+2025-02-12T22:49:44.512+0530	info	logger/zap.go:85	database connected successfully	{"pid": 47356}
+2025-02-12T22:49:44.513+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 47356}
+2025-02-12T22:52:45.972+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 47356}
+2025-02-12T22:52:45.972+0530	info	logger/zap.go:61		{"pid": 47356, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:52:45.972+0530	info	logger/zap.go:61		{"pid": 47356, "value": ["HTTP server shutdown successfully"]}
+2025-02-12T22:55:55.721+0530	info	logger/zap.go:85	database connected successfully	{"pid": 59027}
+2025-02-12T22:55:55.721+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 59027}
+2025-02-12T22:55:55.722+0530	info	logger/zap.go:61		{"pid": 59027, "value": ["listening on 3001"]}
+2025-02-12T22:56:03.437+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 59027}
+2025-02-12T22:56:03.438+0530	info	logger/zap.go:61		{"pid": 59027, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:56:03.438+0530	info	logger/zap.go:61		{"pid": 59027, "value": ["HTTP server shutdown successfully"]}
+2025-02-12T22:56:53.870+0530	info	logger/zap.go:85	database connected successfully	{"pid": 60682}
+2025-02-12T22:56:53.871+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 60682}
+2025-02-12T22:56:53.872+0530	info	logger/zap.go:61		{"pid": 60682, "value": ["listening on 3001"]}
+2025-02-12T22:57:19.826+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 60682}
+2025-02-12T22:57:19.826+0530	info	logger/zap.go:61		{"pid": 60682, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:57:19.826+0530	info	logger/zap.go:61		{"pid": 60682, "value": ["HTTP server shutdown successfully"]}
+2025-02-12T22:57:21.588+0530	info	logger/zap.go:85	database connected successfully	{"pid": 61489}
+2025-02-12T22:57:21.589+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 61489}
+2025-02-12T22:57:21.590+0530	info	logger/zap.go:85	listening on 3001	{"pid": 61489}
+2025-02-12T22:57:35.891+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 61489}
+2025-02-12T22:57:35.891+0530	info	logger/zap.go:61		{"pid": 61489, "value": ["HTTP server shutdown successfully"]}
+2025-02-12T22:57:35.891+0530	info	logger/zap.go:61		{"pid": 61489, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:57:37.594+0530	info	logger/zap.go:85	database connected successfully	{"pid": 62071}
+2025-02-12T22:57:37.595+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 62071}
+2025-02-12T22:57:37.596+0530	info	logger/zap.go:85	GraphQL Server listening on 3001	{"pid": 62071}
+2025-02-12T22:57:48.959+0530	info	logger/zap.go:85	Shutting down HTTP PORT: {:3000}	{"pid": 62071}
+2025-02-12T22:57:48.959+0530	info	logger/zap.go:61		{"pid": 62071, "value": ["All servers shut down gracefully"]}
+2025-02-12T22:57:48.959+0530	info	logger/zap.go:61		{"pid": 62071, "value": ["HTTP server shutdown successfully"]}
+2025-02-12T22:57:50.960+0530	info	logger/zap.go:85	database connected successfully	{"pid": 62501}
+2025-02-12T22:57:50.960+0530	info	logger/zap.go:85	Starting echo server on port :3000	{"pid": 62501}
+2025-02-12T22:57:50.962+0530	info	logger/zap.go:85	GraphQL Server listening on 3001	{"pid": 62501}

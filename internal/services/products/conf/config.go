@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"pkg/db"
 	http "pkg/http/server"
 	"pkg/logger"
 	"products/app/core/models"
@@ -28,6 +29,7 @@ type Config struct {
 	Service *models.Service      `mapstructure:"service" validate:"required"`
 	Echo    *http.EchoConfig     `mapstructure:"echo" validate:"required"`
 	Logger  *logger.LoggerConfig `mapstructure:"logger" validate:"required"`
+	Sql     *db.SQLConfig        `mapstructure:"sql" validate:"required"`
 }
 
 /**
@@ -42,7 +44,7 @@ type Config struct {
  * - Returns the loaded Config struct, EchoConfig struct, and an error if any occurs during the process.
  */
 
-func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, error) {
+func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfig, error) {
 	env := os.Getenv("APP_ENV")
 	if env == "" {
 		env = "development"
@@ -63,7 +65,7 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, error) {
 			d, err := CallerDirPath()
 			if err != nil {
 				log.Println("Error getting current directory:", err)
-				return nil, nil, nil, err
+				return nil, nil, nil, nil, err
 			}
 			configPath = d
 		}
@@ -75,17 +77,17 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, error) {
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Println("Error reading config file:", err)
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	if err := viper.Unmarshal(cnf); err != nil {
 		log.Println("Error unmarshalling config file:", err)
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	log.Println("Config loaded successfully from:", configPath)
 
-	return cnf, cnf.Echo, cnf.Logger, nil
+	return cnf, cnf.Echo, cnf.Logger, cnf.Sql, nil
 }
 
 /**

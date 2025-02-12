@@ -1,0 +1,43 @@
+# schema tells gqlgen where the GraphQL schema is located.
+schema:
+- cgfx/gql/ent.graphql
+
+# resolver reports where the resolver implementations go.
+resolver:
+  layout: follow-schema
+  preserve_resolver: false
+  dir: cgfx/gql
+
+# gqlgen will search for any type names in the schema in these Go packages.
+# If they match, it will use them; otherwise, it will generate them.
+
+# autobind tells gqlgen to search for any type names in the GraphQL schema in the
+# provided package. If they match, it will use them; otherwise, it will generate new ones.
+autobind:
+  - github.com/99designs/gqlgen/graphql/introspection
+  - products/cgfx/ent/gen
+  - products/cgfx/ent/gen/user
+  - products/cgfx/ent/gen/order
+
+# This section declares type mapping between the GraphQL and Go type systems.
+models:
+  # Defines the ID field as Go 'UUID'.
+  UUID:
+    model:
+      - products/cgfx/ent/schema/uuidgql.UUID
+  Node:
+    model:
+      - products/cgfx/ent/gen.Noder
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.IntID
+  Uint64:
+    model:
+      - github.com/99designs/gqlgen/graphql.Uint64
+# Specifies where to generate the code
+exec:
+  filename: cgfx/gql/generated.go
+  package: gql
+model:
+  filename: cgfx/gql/models_gen.go
+  package: gql

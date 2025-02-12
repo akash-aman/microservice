@@ -12,4 +12,6 @@ import (
 func ConfigEndpoints(validate *validator.Validate, log logger.ILogger, echo *echo.Echo, ctx context.Context) {
 	//register_user_v1.MapRoute(validate, log, echo, ctx)
 	registerGetProductById_v1.MapRoute(validate, log, echo, ctx)
+	// Add graphql endpoint.
+
 }
