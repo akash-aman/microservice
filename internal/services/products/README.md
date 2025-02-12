@@ -76,12 +76,23 @@ The following is the folder structure of the project:
 - **sqlc**: SQL code and database migrations.
 
 
+## Entity Framework Code Generation
+
+- Ent Code & Gql Schema
 ```
 go run ./cgfx/ent/entc.go 
 go run ./cgfx/ent/gqlc.go 
 ```
-
+- GQL Resolvers
 ```
 go get github.com/99designs/gqlgen
 go run github.com/99designs/gqlgen
 ```
+
+## To Do
+
+- [ ] Setup authentication or EF GraphQL. 
+- [ ] Setup Custom GraphQL Server & Resolvers.
+- [ ] Setup Kafka Service for Communication between services.
+- [ ] Setup casbin for authorization.
+- [ ] Setup websockets & Grpc.
