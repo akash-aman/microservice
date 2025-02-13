@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -107,14 +108,14 @@ func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
 }
 
 // AddOrderIDs adds the "orders" edge to the Order entity by IDs.
-func (uu *UserUpdate) AddOrderIDs(ids ...int) *UserUpdate {
+func (uu *UserUpdate) AddOrderIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddOrderIDs(ids...)
 	return uu
 }
 
 // AddOrders adds the "orders" edges to the Order entity.
 func (uu *UserUpdate) AddOrders(o ...*Order) *UserUpdate {
-	ids := make([]int, len(o))
+	ids := make([]uuid.UUID, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -133,14 +134,14 @@ func (uu *UserUpdate) ClearOrders() *UserUpdate {
 }
 
 // RemoveOrderIDs removes the "orders" edge to Order entities by IDs.
-func (uu *UserUpdate) RemoveOrderIDs(ids ...int) *UserUpdate {
+func (uu *UserUpdate) RemoveOrderIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemoveOrderIDs(ids...)
 	return uu
 }
 
 // RemoveOrders removes "orders" edges to Order entities.
 func (uu *UserUpdate) RemoveOrders(o ...*Order) *UserUpdate {
-	ids := make([]int, len(o))
+	ids := make([]uuid.UUID, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -223,7 +224,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := uu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID))
 	if ps := uu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -257,7 +258,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -270,7 +271,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -286,7 +287,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -393,14 +394,14 @@ func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
 }
 
 // AddOrderIDs adds the "orders" edge to the Order entity by IDs.
-func (uuo *UserUpdateOne) AddOrderIDs(ids ...int) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddOrderIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddOrderIDs(ids...)
 	return uuo
 }
 
 // AddOrders adds the "orders" edges to the Order entity.
 func (uuo *UserUpdateOne) AddOrders(o ...*Order) *UserUpdateOne {
-	ids := make([]int, len(o))
+	ids := make([]uuid.UUID, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -419,14 +420,14 @@ func (uuo *UserUpdateOne) ClearOrders() *UserUpdateOne {
 }
 
 // RemoveOrderIDs removes the "orders" edge to Order entities by IDs.
-func (uuo *UserUpdateOne) RemoveOrderIDs(ids ...int) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemoveOrderIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemoveOrderIDs(ids...)
 	return uuo
 }
 
 // RemoveOrders removes "orders" edges to Order entities.
 func (uuo *UserUpdateOne) RemoveOrders(o ...*Order) *UserUpdateOne {
-	ids := make([]int, len(o))
+	ids := make([]uuid.UUID, len(o))
 	for i := range o {
 		ids[i] = o[i].ID
 	}
@@ -522,7 +523,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if err := uuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID))
 	id, ok := uuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`gen: missing "User.id" for update`)}
@@ -573,7 +574,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -586,7 +587,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -602,7 +603,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.OrdersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

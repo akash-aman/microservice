@@ -27,5 +27,5 @@ func HasPermission() func(context.Context, interface{}, graphql.Resolver, []stri
 // checkPermissions is a placeholder function to check permissions
 func checkPermissions(ctx context.Context, permissions []string) bool {
 	// implement your permission checking logic here
-	return false
+	return true
 }

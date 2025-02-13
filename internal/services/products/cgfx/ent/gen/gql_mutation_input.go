@@ -5,6 +5,8 @@ package gen
 import (
 	"products/cgfx/ent/gen/order"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // CreateOrderInput represents a mutation input for creating orders.
@@ -13,7 +15,7 @@ type CreateOrderInput struct {
 	Total     float64
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
-	UserID    *int
+	UserID    *uuid.UUID
 }
 
 // Mutate applies the CreateOrderInput on the OrderMutation builder.
@@ -45,7 +47,7 @@ type UpdateOrderInput struct {
 	Total     *float64
 	UpdatedAt *time.Time
 	ClearUser bool
-	UserID    *int
+	UserID    *uuid.UUID
 }
 
 // Mutate applies the UpdateOrderInput on the OrderMutation builder.
@@ -87,7 +89,7 @@ type CreateUserInput struct {
 	Email     string
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
-	OrderIDs  []int
+	OrderIDs  []uuid.UUID
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
@@ -121,8 +123,8 @@ type UpdateUserInput struct {
 	Email          *string
 	UpdatedAt      *time.Time
 	ClearOrders    bool
-	AddOrderIDs    []int
-	RemoveOrderIDs []int
+	AddOrderIDs    []uuid.UUID
+	RemoveOrderIDs []uuid.UUID
 }
 
 // Mutate applies the UpdateUserInput on the UserMutation builder.

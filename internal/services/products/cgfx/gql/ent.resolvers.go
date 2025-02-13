@@ -9,20 +9,21 @@ import (
 	"products/cgfx/ent/gen"
 
 	"entgo.io/contrib/entgql"
+	"github.com/google/uuid"
 )
 
 // Node is the resolver for the node field.
-func (r *queryResolver) Node(ctx context.Context, id int) (gen.Noder, error) {
+func (r *queryResolver) Node(ctx context.Context, id uuid.UUID) (gen.Noder, error) {
 	return r.client.Noder(ctx, id)
 }
 
 // Nodes is the resolver for the nodes field.
-func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]gen.Noder, error) {
+func (r *queryResolver) Nodes(ctx context.Context, ids []uuid.UUID) ([]gen.Noder, error) {
 	return r.client.Noders(ctx, ids)
 }
 
 // Orders is the resolver for the orders field.
-func (r *queryResolver) Orders(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy []*gen.OrderOrder, where *gen.OrderWhereInput) (*gen.OrderConnection, error) {
+func (r *queryResolver) Orders(ctx context.Context, after *entgql.Cursor[uuid.UUID], first *int, before *entgql.Cursor[uuid.UUID], last *int, orderBy []*gen.OrderOrder, where *gen.OrderWhereInput) (*gen.OrderConnection, error) {
 	return r.client.Order.Query().
 		Paginate(ctx, after, first, before, last,
 			gen.WithOrderOrder(orderBy),
@@ -31,7 +32,7 @@ func (r *queryResolver) Orders(ctx context.Context, after *entgql.Cursor[int], f
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy []*gen.UserOrder, where *gen.UserWhereInput) (*gen.UserConnection, error) {
+func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[uuid.UUID], first *int, before *entgql.Cursor[uuid.UUID], last *int, orderBy []*gen.UserOrder, where *gen.UserWhereInput) (*gen.UserConnection, error) {
 	return r.client.User.Query().
 		Paginate(ctx, after, first, before, last,
 			gen.WithUserOrder(orderBy),
@@ -43,3 +44,97 @@ func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[int], fi
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *orderResolver) ID(ctx context.Context, obj *gen.Order) (int, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+func (r *userResolver) ID(ctx context.Context, obj *gen.User) (int, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+func (r *createOrderInputResolver) UserID(ctx context.Context, obj *gen.CreateOrderInput, data *int) error {
+	panic(fmt.Errorf("not implemented: UserID - userID"))
+}
+func (r *createUserInputResolver) OrderIDs(ctx context.Context, obj *gen.CreateUserInput, data []int) error {
+	panic(fmt.Errorf("not implemented: OrderIDs - orderIDs"))
+}
+func (r *orderWhereInputResolver) ID(ctx context.Context, obj *gen.OrderWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+func (r *orderWhereInputResolver) IDNeq(ctx context.Context, obj *gen.OrderWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDNeq - idNEQ"))
+}
+func (r *orderWhereInputResolver) IDIn(ctx context.Context, obj *gen.OrderWhereInput, data []int) error {
+	panic(fmt.Errorf("not implemented: IDIn - idIn"))
+}
+func (r *orderWhereInputResolver) IDNotIn(ctx context.Context, obj *gen.OrderWhereInput, data []int) error {
+	panic(fmt.Errorf("not implemented: IDNotIn - idNotIn"))
+}
+func (r *orderWhereInputResolver) IDGt(ctx context.Context, obj *gen.OrderWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDGt - idGT"))
+}
+func (r *orderWhereInputResolver) IDGte(ctx context.Context, obj *gen.OrderWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDGte - idGTE"))
+}
+func (r *orderWhereInputResolver) IDLt(ctx context.Context, obj *gen.OrderWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDLt - idLT"))
+}
+func (r *orderWhereInputResolver) IDLte(ctx context.Context, obj *gen.OrderWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDLte - idLTE"))
+}
+func (r *updateOrderInputResolver) UserID(ctx context.Context, obj *gen.UpdateOrderInput, data *int) error {
+	panic(fmt.Errorf("not implemented: UserID - userID"))
+}
+func (r *updateUserInputResolver) AddOrderIDs(ctx context.Context, obj *gen.UpdateUserInput, data []int) error {
+	panic(fmt.Errorf("not implemented: AddOrderIDs - addOrderIDs"))
+}
+func (r *updateUserInputResolver) RemoveOrderIDs(ctx context.Context, obj *gen.UpdateUserInput, data []int) error {
+	panic(fmt.Errorf("not implemented: RemoveOrderIDs - removeOrderIDs"))
+}
+func (r *userWhereInputResolver) ID(ctx context.Context, obj *gen.UserWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+func (r *userWhereInputResolver) IDNeq(ctx context.Context, obj *gen.UserWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDNeq - idNEQ"))
+}
+func (r *userWhereInputResolver) IDIn(ctx context.Context, obj *gen.UserWhereInput, data []int) error {
+	panic(fmt.Errorf("not implemented: IDIn - idIn"))
+}
+func (r *userWhereInputResolver) IDNotIn(ctx context.Context, obj *gen.UserWhereInput, data []int) error {
+	panic(fmt.Errorf("not implemented: IDNotIn - idNotIn"))
+}
+func (r *userWhereInputResolver) IDGt(ctx context.Context, obj *gen.UserWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDGt - idGT"))
+}
+func (r *userWhereInputResolver) IDGte(ctx context.Context, obj *gen.UserWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDGte - idGTE"))
+}
+func (r *userWhereInputResolver) IDLt(ctx context.Context, obj *gen.UserWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDLt - idLT"))
+}
+func (r *userWhereInputResolver) IDLte(ctx context.Context, obj *gen.UserWhereInput, data *int) error {
+	panic(fmt.Errorf("not implemented: IDLte - idLTE"))
+}
+func (r *Resolver) Order() OrderResolver { return &orderResolver{r} }
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+func (r *Resolver) CreateOrderInput() CreateOrderInputResolver { return &createOrderInputResolver{r} }
+func (r *Resolver) CreateUserInput() CreateUserInputResolver { return &createUserInputResolver{r} }
+func (r *Resolver) OrderWhereInput() OrderWhereInputResolver { return &orderWhereInputResolver{r} }
+func (r *Resolver) UpdateOrderInput() UpdateOrderInputResolver { return &updateOrderInputResolver{r} }
+func (r *Resolver) UpdateUserInput() UpdateUserInputResolver { return &updateUserInputResolver{r} }
+func (r *Resolver) UserWhereInput() UserWhereInputResolver { return &userWhereInputResolver{r} }
+type orderResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
+type createOrderInputResolver struct{ *Resolver }
+type createUserInputResolver struct{ *Resolver }
+type orderWhereInputResolver struct{ *Resolver }
+type updateOrderInputResolver struct{ *Resolver }
+type updateUserInputResolver struct{ *Resolver }
+type userWhereInputResolver struct{ *Resolver }
+*/

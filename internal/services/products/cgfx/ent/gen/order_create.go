@@ -12,6 +12,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // OrderCreate is the builder for creating a Order entity.
@@ -70,19 +71,27 @@ func (oc *OrderCreate) SetNillableUpdatedAt(t *time.Time) *OrderCreate {
 }
 
 // SetID sets the "id" field.
-func (oc *OrderCreate) SetID(i int) *OrderCreate {
-	oc.mutation.SetID(i)
+func (oc *OrderCreate) SetID(u uuid.UUID) *OrderCreate {
+	oc.mutation.SetID(u)
+	return oc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (oc *OrderCreate) SetNillableID(u *uuid.UUID) *OrderCreate {
+	if u != nil {
+		oc.SetID(*u)
+	}
 	return oc
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (oc *OrderCreate) SetUserID(id int) *OrderCreate {
+func (oc *OrderCreate) SetUserID(id uuid.UUID) *OrderCreate {
 	oc.mutation.SetUserID(id)
 	return oc
 }
 
 // SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (oc *OrderCreate) SetNillableUserID(id *int) *OrderCreate {
+func (oc *OrderCreate) SetNillableUserID(id *uuid.UUID) *OrderCreate {
 	if id != nil {
 		oc = oc.SetUserID(*id)
 	}
@@ -141,6 +150,10 @@ func (oc *OrderCreate) defaults() {
 		v := order.DefaultUpdatedAt()
 		oc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := oc.mutation.ID(); !ok {
+		v := order.DefaultID()
+		oc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -181,9 +194,12 @@ func (oc *OrderCreate) sqlSave(ctx context.Context) (*Order, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
 	}
 	oc.mutation.id = &_node.ID
 	oc.mutation.done = true
@@ -193,11 +209,11 @@ func (oc *OrderCreate) sqlSave(ctx context.Context) (*Order, error) {
 func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Order{config: oc.config}
-		_spec = sqlgraph.NewCreateSpec(order.Table, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(order.Table, sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID))
 	)
 	if id, ok := oc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := oc.mutation.Status(); ok {
 		_spec.SetField(order.FieldStatus, field.TypeEnum, value)
@@ -223,7 +239,7 @@ func (oc *OrderCreate) createSpec() (*Order, *sqlgraph.CreateSpec) {
 			Columns: []string{order.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -280,10 +296,6 @@ func (ocb *OrderCreateBulk) Save(ctx context.Context) ([]*Order, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

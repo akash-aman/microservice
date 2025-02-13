@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Define enum types
@@ -35,7 +36,8 @@ type User struct {
 
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
 			Immutable().
 			Annotations(
 				entgql.OrderField("ID"),
@@ -107,7 +109,8 @@ type Order struct {
 
 func (Order) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
 			Immutable().
 			Annotations(
 				entgql.OrderField("ID"),

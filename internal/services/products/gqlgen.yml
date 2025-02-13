@@ -32,7 +32,9 @@ models:
       - products/cgfx/ent/gen.Noder
   ID:
     model:
-      - github.com/99designs/gqlgen/graphql.IntID
+      - products/cgfx/ent/schema/uuidgql.UUID
+      #- github.com/99designs/gqlgen/graphql.IntID
+
   Uint64:
     model:
       - github.com/99designs/gqlgen/graphql.Uint64

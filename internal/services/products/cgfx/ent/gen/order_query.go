@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // OrderQuery is the builder for querying Order entities.
@@ -109,8 +110,8 @@ func (oq *OrderQuery) FirstX(ctx context.Context) *Order {
 
 // FirstID returns the first Order ID from the query.
 // Returns a *NotFoundError when no Order ID was found.
-func (oq *OrderQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (oq *OrderQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = oq.Limit(1).IDs(setContextOp(ctx, oq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -122,7 +123,7 @@ func (oq *OrderQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (oq *OrderQuery) FirstIDX(ctx context.Context) int {
+func (oq *OrderQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := oq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -160,8 +161,8 @@ func (oq *OrderQuery) OnlyX(ctx context.Context) *Order {
 // OnlyID is like Only, but returns the only Order ID in the query.
 // Returns a *NotSingularError when more than one Order ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (oq *OrderQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (oq *OrderQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = oq.Limit(2).IDs(setContextOp(ctx, oq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -177,7 +178,7 @@ func (oq *OrderQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (oq *OrderQuery) OnlyIDX(ctx context.Context) int {
+func (oq *OrderQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := oq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -205,7 +206,7 @@ func (oq *OrderQuery) AllX(ctx context.Context) []*Order {
 }
 
 // IDs executes the query and returns a list of Order IDs.
-func (oq *OrderQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (oq *OrderQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if oq.ctx.Unique == nil && oq.path != nil {
 		oq.Unique(true)
 	}
@@ -217,7 +218,7 @@ func (oq *OrderQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (oq *OrderQuery) IDsX(ctx context.Context) []int {
+func (oq *OrderQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := oq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -421,8 +422,8 @@ func (oq *OrderQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Order,
 }
 
 func (oq *OrderQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Order, init func(*Order), assign func(*Order, *User)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Order)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Order)
 	for i := range nodes {
 		if nodes[i].user_orders == nil {
 			continue
@@ -466,7 +467,7 @@ func (oq *OrderQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (oq *OrderQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(order.Table, order.Columns, sqlgraph.NewFieldSpec(order.FieldID, field.TypeUUID))
 	_spec.From = oq.sql
 	if unique := oq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

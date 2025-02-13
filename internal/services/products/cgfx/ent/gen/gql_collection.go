@@ -12,6 +12,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -185,8 +186,8 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 							ids[i] = nodes[i].ID
 						}
 						var v []struct {
-							NodeID int `sql:"user_orders"`
-							Count  int `sql:"count"`
+							NodeID uuid.UUID `sql:"user_orders"`
+							Count  int       `sql:"count"`
 						}
 						query.Where(func(s *sql.Selector) {
 							s.Where(sql.InValues(s.C(user.OrdersColumn), ids...))
@@ -194,7 +195,7 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 						if err := query.GroupBy(user.OrdersColumn).Aggregate(Count()).Scan(ctx, &v); err != nil {
 							return err
 						}
-						m := make(map[int]int, len(v))
+						m := make(map[uuid.UUID]int, len(v))
 						for i := range v {
 							m[v[i].NodeID] = v[i].Count
 						}

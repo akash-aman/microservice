@@ -7,14 +7,16 @@ import (
 	"encoding/json"
 	"products/cgfx/ent/gen/order"
 	"products/cgfx/ent/gen/user"
+
+	"github.com/google/uuid"
 )
 
 // Node in the graph.
 type Node struct {
-	ID     int      `json:"id,omitempty"`     // node id.
-	Type   string   `json:"type,omitempty"`   // node type.
-	Fields []*Field `json:"fields,omitempty"` // node fields.
-	Edges  []*Edge  `json:"edges,omitempty"`  // node edges.
+	ID     uuid.UUID `json:"id,omitempty"`     // node id.
+	Type   string    `json:"type,omitempty"`   // node type.
+	Fields []*Field  `json:"fields,omitempty"` // node fields.
+	Edges  []*Edge   `json:"edges,omitempty"`  // node edges.
 }
 
 // Field of a node.
@@ -26,9 +28,9 @@ type Field struct {
 
 // Edges between two nodes.
 type Edge struct {
-	Type string `json:"type,omitempty"` // edge type.
-	Name string `json:"name,omitempty"` // edge name.
-	IDs  []int  `json:"ids,omitempty"`  // node ids (where this edge point to).
+	Type string      `json:"type,omitempty"` // edge type.
+	Name string      `json:"name,omitempty"` // edge name.
+	IDs  []uuid.UUID `json:"ids,omitempty"`  // node ids (where this edge point to).
 }
 
 // Node implements Noder interface
@@ -159,7 +161,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 //
 // This API helpful in case you want to build
 // an administrator tool to browser all types in system.
-func (c *Client) Node(ctx context.Context, id int) (*Node, error) {
+func (c *Client) Node(ctx context.Context, id uuid.UUID) (*Node, error) {
 	n, err := c.Noder(ctx, id)
 	if err != nil {
 		return nil, err

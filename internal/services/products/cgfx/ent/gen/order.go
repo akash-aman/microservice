@@ -11,13 +11,14 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 )
 
 // Order is the model entity for the Order schema.
 type Order struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status order.Status `json:"status,omitempty"`
 	// Total holds the value of the "total" field.
@@ -29,7 +30,7 @@ type Order struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderQuery when eager-loading is set.
 	Edges        OrderEdges `json:"edges"`
-	user_orders  *int
+	user_orders  *uuid.UUID
 	selectValues sql.SelectValues
 }
 
@@ -62,14 +63,14 @@ func (*Order) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case order.FieldTotal:
 			values[i] = new(sql.NullFloat64)
-		case order.FieldID:
-			values[i] = new(sql.NullInt64)
 		case order.FieldStatus:
 			values[i] = new(sql.NullString)
 		case order.FieldCreatedAt, order.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case order.FieldID:
+			values[i] = new(uuid.UUID)
 		case order.ForeignKeys[0]: // user_orders
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,11 +87,11 @@ func (o *Order) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case order.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				o.ID = *value
 			}
-			o.ID = int(value.Int64)
 		case order.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
@@ -116,11 +117,11 @@ func (o *Order) assignValues(columns []string, values []any) error {
 				o.UpdatedAt = value.Time
 			}
 		case order.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_orders", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_orders", values[i])
 			} else if value.Valid {
-				o.user_orders = new(int)
-				*o.user_orders = int(value.Int64)
+				o.user_orders = new(uuid.UUID)
+				*o.user_orders = *value.S.(*uuid.UUID)
 			}
 		default:
 			o.selectValues.Set(columns[i], values[i])
