@@ -32,16 +32,18 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.IL
 				log.Infof("Starting echo server on port %v", config.Echo.Port)
 
 				if err := server.RunEchoServer(ctx, e, log, config.Echo); !errors.Is(err, http.ErrServerClosed) {
-					log.Error("Error starting echo server", err)
+					log.Errorf("Error starting echo server %s", err)
 				}
 			}()
 
 			/**
-			 * Service Route.
+			 * GraphQL Server
 			 */
-			e.GET("/", func(c echo.Context) error {
-				return c.String(http.StatusOK, config.Service.Name)
-			})
+			go func() {
+				if err := inits.InitGraphQLServer(ctx, client, log, config.GraphQL); !errors.Is(err, http.ErrServerClosed) {
+					log.Errorf("Error starting GraphQL server: %s", err)
+				}
+			}()
 
 			/**
 			 * Migration
@@ -52,12 +54,16 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.IL
 				}
 			}()
 
-			go func() {
-				inits.InitGraphQLServer(client, log)
-			}()
+			/**
+			 * Service Route.
+			 */
+			e.GET("/", func(c echo.Context) error {
+				return c.String(http.StatusOK, config.Service.Name)
+			})
 
 			return nil
 		},
+
 		OnStop: func(stopCtx context.Context) error {
 
 			if err := e.Shutdown(stopCtx); err != nil {
