@@ -33,7 +33,7 @@ type OtelConfig struct {
 
 type OtelCleanUp func(context.Context) error
 
-func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelCleanUp {
+func InitTracer(conf *OtelConfig, log logger.ILogger) OtelCleanUp {
 
 	if collectorURL == "" {
 		collectorURL = fmt.Sprintf("%s:%s", conf.Host, conf.Port)
