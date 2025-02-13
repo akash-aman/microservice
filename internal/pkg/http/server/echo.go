@@ -45,7 +45,7 @@ func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.ILogger, cfg
 					log.Errorf("Error shutting down HTTP server {%v}", err)
 					return
 				}
-				log.Info("HTTP server shutdown successfully")
+				log.Info("HTTP server shutdown gracefully")
 				return
 			}
 		}
