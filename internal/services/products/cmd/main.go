@@ -6,6 +6,7 @@ import (
 	http "pkg/http"
 	httpServer "pkg/http/server"
 	"pkg/logger"
+	"pkg/otel"
 	"products/app/inits"
 	"products/conf"
 	"products/server"
@@ -31,6 +32,7 @@ func main() {
 			httpServer.NewEchoServer,
 			inits.NewEntClient,
 			gql.NewGQLServer,
+			otel.InitTracer,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),
