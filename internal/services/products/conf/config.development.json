@@ -9,6 +9,12 @@
             "wss"
         ]
     },
+    "telemetry": {
+        "service": "products",
+        "host": "localhost",
+        "port": 5775,
+        "insecure": true
+    },
     "logger": {
         "level": "debug",
         "type": "zap",

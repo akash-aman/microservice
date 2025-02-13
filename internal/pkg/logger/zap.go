@@ -1,5 +1,10 @@
 package logger
 
+/**
+ * https://www.youtube.com/watch?v=I2mWnh66Bkg
+ * 
+ * Need fixes according to above.
+ */
 import (
 	"os"
 
