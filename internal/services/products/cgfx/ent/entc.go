@@ -13,11 +13,19 @@ import (
 	"entgo.io/ent/entc/gen"
 )
 
+const (
+	gqlgenConfigPath  = "gqlgen.yml"
+	entitySchemaPath  = "./cgfx/ent/schema"
+	targetOutputPath  = "./cgfx/ent/gen"
+	graphQLSchemaPath = "./cgfx/gql/ent.graphql"
+	outputPackageName = "products/cgfx/ent/gen"
+)
+
 func main() {
 	ex, err := entgql.NewExtension(
 		entgql.WithSchemaGenerator(),
-		entgql.WithSchemaPath("./cgfx/gql/ent.graphql"),
-		entgql.WithConfigPath("gqlgen.yml"),
+		entgql.WithSchemaPath(graphQLSchemaPath),
+		entgql.WithConfigPath(gqlgenConfigPath),
 		entgql.WithWhereInputs(true),
 		entgql.WithRelaySpec(true),
 		entgql.WithNodeDescriptor(true),
@@ -28,9 +36,9 @@ func main() {
 	opts := []entc.Option{
 		entc.Extensions(ex),
 	}
-	if err := entc.Generate("./cgfx/ent/schema", &gen.Config{
-		Target:  "./cgfx/ent/gen",
-		Package: "products/cgfx/ent/gen",
+	if err := entc.Generate(entitySchemaPath, &gen.Config{
+		Target:  targetOutputPath,
+		Package: outputPackageName,
 		Features: []gen.Feature{
 			gen.FeatureModifier,
 		},
