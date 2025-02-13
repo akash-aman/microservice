@@ -19,7 +19,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, gqlsrv *http.Server, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -40,7 +40,7 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.IL
 			 * GraphQL Server
 			 */
 			go func() {
-				if err := inits.InitGraphQLServer(ctx, client, log, config.GraphQL); !errors.Is(err, http.ErrServerClosed) {
+				if err := inits.InitGraphQLServer(ctx, client, log, config.GraphQL, gqlsrv); !errors.Is(err, http.ErrServerClosed) {
 					log.Errorf("Error starting GraphQL server: %s", err)
 				}
 			}()
@@ -68,6 +68,10 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.IL
 
 			if err := e.Shutdown(stopCtx); err != nil {
 				log.Errorf("error shutting down HTTP server: %v", err)
+			}
+
+			if err := gqlsrv.Shutdown(stopCtx); err != nil {
+				log.Errorf("error shutting down GraphQL server: %v", err)
 			}
 
 			log.Info("All servers shut down gracefully")

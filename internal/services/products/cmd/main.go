@@ -2,6 +2,7 @@ package main
 
 import (
 	"pkg/db"
+	"pkg/gql"
 	http "pkg/http"
 	httpServer "pkg/http/server"
 	"pkg/logger"
@@ -29,6 +30,7 @@ func main() {
 			db.NewConnectPool,
 			httpServer.NewEchoServer,
 			inits.NewEntClient,
+			gql.NewGQLServer,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),
