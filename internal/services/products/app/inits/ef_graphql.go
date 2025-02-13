@@ -48,8 +48,12 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogg
 
 	go func() {
 		<-ctx.Done()
-		log.Infof("Shutting down GraphQL server")
-		server.Shutdown(context.Background())
+		err := server.Shutdown(context.Background())
+		if err != nil {
+			log.Errorf("Error shutting down GraphQL server: %v", err)
+		} else {
+			log.Infof("GraphQL server shut down gracefully")
+		}
 	}()
 
 	log.Infof("Starting GraphQL Server on port :3001")

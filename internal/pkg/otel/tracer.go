@@ -33,7 +33,7 @@ type OtelConfig struct {
 
 type OtelCleanUp func(context.Context) error
 
-func InitTracer(conf *OtelConfig, log logger.ILogger) OtelCleanUp {
+func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelCleanUp {
 
 	if collectorURL == "" {
 		collectorURL = fmt.Sprintf("%s:%s", conf.Host, conf.Port)
@@ -76,5 +76,16 @@ func InitTracer(conf *OtelConfig, log logger.ILogger) OtelCleanUp {
 			sdktrace.WithResource(resources),
 		),
 	)
+
+	go func() {
+		<-ctx.Done()
+		err = exporter.Shutdown(context.Background())
+		if err != nil {
+			log.Errorf("Error exiting open-telemetry %v", err)
+		} else {
+			log.Info("open-telemetry exited gracefully")
+		}
+	}()
+
 	return exporter.Shutdown
 }
