@@ -7,8 +7,8 @@ package otel
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
+	"pkg/logger"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -31,7 +31,9 @@ type OtelConfig struct {
 	Insecure bool   `mapstructure:"insecure"`
 }
 
-func InitTracer(conf *OtelConfig) func(context.Context) error {
+type OtelCleanUp func(context.Context) error
+
+func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelCleanUp {
 
 	if collectorURL == "" {
 		collectorURL = fmt.Sprintf("%s:%s", conf.Host, conf.Port)

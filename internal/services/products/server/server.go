@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"pkg/http/server"
 	"pkg/logger"
+	"pkg/otel"
 	"products/app/inits"
 	"products/cgfx/ent/gen"
 	"products/conf"
@@ -19,7 +20,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, gqlsrv *http.Server, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, gqlsrv *http.Server, otelCleanUp otel.OtelCleanUp, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -68,10 +69,20 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.IL
 
 			if err := e.Shutdown(stopCtx); err != nil {
 				log.Errorf("error shutting down HTTP server: %v", err)
+			} else {
+				log.Info("HTTP server shut down gracefully")
 			}
 
 			if err := gqlsrv.Shutdown(stopCtx); err != nil {
 				log.Errorf("error shutting down GraphQL server: %v", err)
+			} else {
+				log.Info("GraphQL server shut down gracefully")
+			}
+
+			if err := otelCleanUp(stopCtx); err != nil {
+				log.Errorf("error shutting down open-telemetry: %v", err)
+			} else {
+				log.Info("open-telemetry shut down gracefully")
 			}
 
 			log.Info("All servers shut down gracefully")
