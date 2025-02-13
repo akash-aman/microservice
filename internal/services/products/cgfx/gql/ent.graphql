@@ -39,7 +39,7 @@ interface Node @goModel(model: "products/cgfx/ent/gen.Noder") {
   """
   id: ID!
 }
-type Order implements Node {
+type Order implements Node @hasPermissions(permissions: ["ADMIN","MODERATOR"]) {
   id: ID!
   status: OrderStatus!
   total: Float!

@@ -46,6 +46,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	HasPermissions func(ctx context.Context, obj any, next graphql.Resolver, permissions []string) (res any, err error)
 }
 
 type ComplexityRoot struct {
@@ -478,7 +479,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "ent.graphql"
+//go:embed "service.graphql" "ent.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -490,6 +491,7 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
+	{Name: "service.graphql", Input: sourceData("service.graphql"), BuiltIn: false},
 	{Name: "ent.graphql", Input: sourceData("ent.graphql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -497,6 +499,34 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) dir_hasPermissions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.dir_hasPermissions_argsPermissions(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["permissions"] = arg0
+	return args, nil
+}
+func (ec *executionContext) dir_hasPermissions_argsPermissions(
+	ctx context.Context,
+	rawArgs map[string]any,
+) ([]string, error) {
+	if _, ok := rawArgs["permissions"]; !ok {
+		var zeroVal []string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("permissions"))
+	if tmp, ok := rawArgs["permissions"]; ok {
+		return ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+	}
+
+	var zeroVal []string
+	return zeroVal, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -1568,8 +1598,35 @@ func (ec *executionContext) _OrderEdge_node(ctx context.Context, field graphql.C
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Node, nil
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			permissions, err := ec.unmarshalNString2ᚕstringᚄ(ctx, []any{"ADMIN", "MODERATOR"})
+			if err != nil {
+				var zeroVal *gen.Order
+				return zeroVal, err
+			}
+			if ec.directives.HasPermissions == nil {
+				var zeroVal *gen.Order
+				return zeroVal, errors.New("directive hasPermissions is not implemented")
+			}
+			return ec.directives.HasPermissions(ctx, obj, directive0, permissions)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*gen.Order); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *products/cgfx/ent/gen.Order`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7116,6 +7173,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
