@@ -37,5 +37,13 @@
         "maxOpenConns": 10,
         "maxLifeTime": 3,
         "maxIdleTime": 3
+    },
+    "graphql": {
+        "port": ":3001",
+        "host": "localhost",
+        "readTimeout": "10s",
+        "writeTimeout": "10s",
+        "BaseRoute": "/graphql",
+        "debugMode": true
     }
 }

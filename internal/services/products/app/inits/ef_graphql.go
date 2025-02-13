@@ -1,8 +1,10 @@
 package inits
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	conf "pkg/gql"
 	"pkg/logger"
 	"products/cgfx/ent/gen"
 	"products/cgfx/gql"
@@ -16,7 +18,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func InitGraphQLServer(client *gen.Client, log logger.ILogger) {
+func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogger, conf *conf.GraphQLConfig, server *http.Server) error {
+
+	if conf == nil {
+		return errors.New("graphQL config not loaded properly")
+	}
+
 	srv := handler.New(gql.NewSchema(client))
 	srv.Use(entgql.Transactioner{TxOpener: client})
 
@@ -36,9 +43,16 @@ func InitGraphQLServer(client *gen.Client, log logger.ILogger) {
 	http.Handle("/graphql", playground.Handler("Todo", "/query"))
 	http.Handle("/query", srv)
 
+	server.Addr = conf.Port
+	server.Handler = http.DefaultServeMux
+
+	go func() {
+		<-ctx.Done()
+		log.Infof("Shutting down GraphQL server")
+		server.Shutdown(context.Background())
+	}()
+
 	log.Infof("Starting GraphQL Server on port :3001")
 
-	if err := http.ListenAndServe(":3001", nil); !errors.Is(err, http.ErrServerClosed) {
-		log.Error("Error starting GraphQL server", err)
-	}
+	return server.ListenAndServe()
 }
