@@ -1,6 +1,11 @@
 package logger
 
-import "log"
+import (
+	"context"
+	"log"
+
+	"go.uber.org/zap"
+)
 
 /**
  * LoggerType represents the type of logger to use
@@ -16,36 +21,38 @@ const (
  * LoggerConfig holds configuration for the logger
  */
 type LoggerConfig struct {
-	LogLevel    string     `mapstructure:"level" validate:"required"`
-	Type        LoggerType `mapstructure:"type" validate:"required"`
-	FileLogging bool       `mapstructure:"fileLogging" validate:"required"`
-	AccessLog   string     `mapstructure:"accessLog" validate:"required"`
-	ErrorLog    string     `mapstructure:"errorLog" validate:"required"`
+	LogLevel    string `mapstructure:"level" validate:"required"`
+	FileLogging bool   `mapstructure:"fileLogging" validate:"required"`
+	AccessLog   string `mapstructure:"accessLog" validate:"required"`
+	ErrorLog    string `mapstructure:"errorLog" validate:"required"`
+	Encoding    string `mapstructure:"encoding" validate:"required"`
 }
 
 /**
  * ILogger interface defines methods that both implementations must satisfy
  */
-type ILogger interface {
+type ILogger[T any] interface {
 	/**
 	 * Structured logging methods (key-value pairs)
 	 */
-	Info(fields ...interface{})
-	Error(fields ...interface{})
-	Debug(fields ...interface{})
-	Warn(fields ...interface{})
-	Panic(fields ...interface{})
-	Fatal(fields ...interface{})
+	Info(ctx context.Context, msg string, fields ...T)
+	Error(ctx context.Context, msg string, fields ...T)
+	Debug(ctx context.Context, msg string, fields ...T)
+	Warn(ctx context.Context, msg string, fields ...T)
+	Panic(ctx context.Context, msg string, fields ...T)
+	Fatal(ctx context.Context, msg string, fields ...T)
+
+	AddTraceAttribute(ctx context.Context, msg string, fields ...T)
 
 	/**
 	 * Format logging methods (printf style)
 	 */
-	Infof(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-	Debugf(format string, args ...interface{})
-	Warnf(format string, args ...interface{})
-	Panicf(format string, args ...interface{})
-	Fatalf(format string, args ...interface{})
+	Infof(ctx context.Context, format string, args ...interface{})
+	Errorf(ctx context.Context, format string, args ...interface{})
+	Debugf(ctx context.Context, format string, args ...interface{})
+	Warnf(ctx context.Context, format string, args ...interface{})
+	Panicf(ctx context.Context, format string, args ...interface{})
+	Fatalf(ctx context.Context, format string, args ...interface{})
 
 	Sync()
 }
@@ -53,15 +60,16 @@ type ILogger interface {
 /**
  * Logger factory function
  */
-func InitLogger(cfg *LoggerConfig) ILogger {
+func InitLogger[T any](cfg *LoggerConfig) ILogger[T] {
 	if cfg == nil {
 		log.Fatal("LoggerConfig is nil. Ensure it is properly initialized.")
 	}
 
-	switch cfg.Type {
-	case LogrusLogger:
-		return newLogrusLogger(cfg)
-	default:
-		return newZapLogger(cfg)
+	switch any(new(T)).(type) {
+	case zap.Field:
+		return any(newZapLogger(cfg)).(ILogger[T])
+	case interface{}:
+		return any(newLogrusLogger(cfg)).(ILogger[T])
 	}
+	return nil
 }
