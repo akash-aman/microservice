@@ -28,7 +28,7 @@ func main() {
 			conf.InitConfig,
 			http.NewContext,
 			validator.New,
-			db.NewConnectPool,
+			db.NewOtelDBConnectionPool,
 			httpServer.NewEchoServer,
 			inits.NewEntClient,
 			gql.NewGQLServer,

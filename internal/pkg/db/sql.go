@@ -6,7 +6,11 @@ import (
 	"pkg/logger"
 	"time"
 
+	"github.com/XSAM/otelsql"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"go.uber.org/zap"
 )
 
 type SQLConfig struct {
@@ -60,6 +64,51 @@ func NewConnectPool(dbconf *SQLConfig, log logger.ILogger) *sql.DB {
 
 	log.Infof("database connected successfully")
 
+	db.SetMaxOpenConns(dbconf.MaxOpenConn)
+	db.SetMaxIdleConns(dbconf.MaxIdleConn)
+	db.SetConnMaxLifetime(time.Duration(dbconf.MaxLifeTime) * time.Second)
+	db.SetConnMaxIdleTime(time.Duration(dbconf.MaxIdleTime) * time.Second)
+	return db
+}
+
+func NewOtelDBConnectionPool(dbconf *SQLConfig, log logger.ILogger) *sql.DB {
+
+	driverName, err := otelsql.Register("mysql", otelsql.WithAttributes(
+		semconv.DBSystemMySQL,
+	))
+
+	if err != nil {
+		log.Errorf("error in registering OpenTelemetry SQL driver: %v", err)
+		return nil
+	}
+
+	// Open the database connection using the wrapped driver
+	db, err := sql.Open(driverName, dbconf.GetMySqlDSN())
+	if err != nil {
+		log.Errorf("error in connecting to the database %v", err)
+		return nil
+	}
+
+	// Register DB stats metrics
+	err = otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
+		semconv.DBSystemMySQL,
+	))
+
+	if err != nil {
+		log.Errorf("error in registering DB stats metrics %v", err)
+		return nil
+	}
+
+	// Test the connection
+	err = db.Ping()
+	if err != nil {
+		log.Errorf("unable to connect to the database: %v", err)
+		return nil
+	}
+
+	log.Info("database connected successfully %s", zap.String("sdfdsf", "key"))
+
+	// Set database connection pool parameters
 	db.SetMaxOpenConns(dbconf.MaxOpenConn)
 	db.SetMaxIdleConns(dbconf.MaxIdleConn)
 	db.SetConnMaxLifetime(time.Duration(dbconf.MaxLifeTime) * time.Second)

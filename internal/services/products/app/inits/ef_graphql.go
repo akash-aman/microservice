@@ -16,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/websocket"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogger, conf *conf.GraphQLConfig, server *http.Server) error {
@@ -40,8 +41,8 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogg
 
 	srv.Use(extension.Introspection{})
 
-	http.Handle("/graphql", playground.Handler("Todo", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/graphql", otelhttp.NewHandler(playground.Handler("Products", "/query"), "Http Query Handler Endpoint"))
+	http.Handle("/query", otelhttp.NewHandler(srv, "GraphQL Query Handler Endpoint"))
 
 	server.Addr = conf.Port
 	server.Handler = http.DefaultServeMux
@@ -56,7 +57,7 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogg
 		}
 	}()
 
-	log.Infof("Starting GraphQL Server on port :3001")
+	log.Infof("Starting GraphQL Server on port %s", conf.Port)
 
 	return server.ListenAndServe()
 }
