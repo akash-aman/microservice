@@ -20,6 +20,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/vektah/gqlparser/v2 v2.5.22
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.59.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
 	go.uber.org/fx v1.23.0
 	pkg v0.0.1
 )
@@ -27,12 +28,14 @@ require (
 require (
 	ariga.io/atlas v0.25.1-0.20240717145915-af51d3945208 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/XSAM/otelsql v0.36.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/agnivade/levenshtein v1.2.0 // indirect
 	github.com/ahmetb/go-linq/v3 v3.2.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

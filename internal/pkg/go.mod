@@ -3,8 +3,11 @@ module pkg
 go 1.23.4
 
 require (
+	github.com/XSAM/otelsql v0.36.0
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lib/pq v1.10.9
+	github.com/qustavo/sqlhooks/v2 v2.1.0
 	github.com/sirupsen/logrus v1.9.3
 	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.34.0
@@ -15,6 +18,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

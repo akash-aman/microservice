@@ -12,18 +12,19 @@
     "telemetry": {
         "service": "products",
         "host": "localhost",
-        "port": 5775,
+        "port": ":4317",
         "insecure": true
     },
     "logger": {
         "level": "debug",
         "type": "zap",
         "fileLogging": true,
+        "encoding": "json",
         "accessLog": "logs/access.log",
         "errorLog": "logs/error.log"
     },
     "echo": {
-        "port": ":3000",
+        "port": ":5004",
         "host": "localhost",
         "readTimeout": "10s",
         "writeTimeout": "10s",
@@ -45,7 +46,7 @@
         "maxIdleTime": 3
     },
     "graphql": {
-        "port": ":3001",
+        "port": ":5005",
         "host": "localhost",
         "readTimeout": "10s",
         "writeTimeout": "10s",
