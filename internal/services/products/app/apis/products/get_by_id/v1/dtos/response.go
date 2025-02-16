@@ -1,6 +1,6 @@
 package dtos
 
-type ProductResponseDto struct {
+type GetProductByIdResponseDto struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
@@ -8,8 +8,8 @@ type ProductResponseDto struct {
 	Stock       int     `json:"stock"`
 }
 
-func NewProductResponseDto(id, name, description string, price float64, stock int) *ProductResponseDto {
-	return &ProductResponseDto{
+func NewGetProductByIdResponseDto(id, name, description string, price float64, stock int) *GetProductByIdResponseDto {
+	return &GetProductByIdResponseDto{
 		ID:          id,
 		Name:        name,
 		Description: description,

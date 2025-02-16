@@ -25,12 +25,17 @@ func MapRoute(validator *validator.Validate, log logger.Zapper, echo *echo.Echo,
 func getProductById(validator *validator.Validate, log logger.Zapper, _ context.Context) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
+		/**
+		 * 
+		 */
 		tracer, ctx := ot.NewTracer(c.Request().Context(), "GetProductById Controller")
 		defer tracer.End()
 
-		request := &dtos_v1.ProductRequestDto{}
+		request := &dtos_v1.GetProductByIdRequestDto{}
 
-		// Bind request data
+		/**
+		 * 
+		 */
 		if err := c.Bind(request); err != nil {
 			errMsg := "[getProductById_handler.Bind] error in the binding request"
 			log.Errorf("Error while binding request: %v", err)
@@ -42,7 +47,9 @@ func getProductById(validator *validator.Validate, log logger.Zapper, _ context.
 
 		command := model_v1.NewGetProductById(request.ProductID)
 
-		// Validate request
+		/**
+		 * 
+		 */
 		if err := validator.StructCtx(ctx, command); err != nil {
 			errMsg := "[getProductById_handler.StructCtx] command validation failed"
 			log.Errorf("Validation error: %v", zap.Error(err))
@@ -50,17 +57,24 @@ func getProductById(validator *validator.Validate, log logger.Zapper, _ context.
 			return echo.NewHTTPError(http.StatusBadRequest, errMsg)
 		}
 
-		// Call Business Logic Handler
-		result, err := mediatr.Send[*model_v1.GetProductById, *dtos_v1.ProductResponseDto](ctx, command)
+		/**
+		 * 
+		 */
+		result, err := mediatr.Send[*model_v1.GetProductById, *dtos_v1.GetProductByIdResponseDto](ctx, command)
 
-		// Check response
+		
+		/**
+		 * 
+		 */
 		if err != nil {
 			log.Errorf("Error processing request: %v", err)
 			tracer.RecordError(err, "Error processing request")
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
 
-		// Log success
+		/**
+		 * 
+		 */
 		log.Infof("Product retrieved successfully, id: %d", result.ID)
 
 		return c.JSON(http.StatusOK, result)

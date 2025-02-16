@@ -1,5 +1,5 @@
 package dtos
 
-type ProductRequestDto struct {
+type GetProductByIdRequestDto struct {
 	ProductID string `json:"productId"`
 }

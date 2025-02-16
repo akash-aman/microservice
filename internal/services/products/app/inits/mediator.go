@@ -14,7 +14,7 @@ import (
 
 func InitMediator(log logger.Zapper, echo *echo.Echo, ctx context.Context) error {
 
-	err := mediatr.RegisterRequestHandler[*getProductById_model_v1.GetProductById, *getProductById_dto_v1.ProductResponseDto](getProductById_handler_v1.RegisterProductHandler(echo, log, ctx))
+	err := mediatr.RegisterRequestHandler[*getProductById_model_v1.GetProductById, *getProductById_dto_v1.GetProductByIdResponseDto](getProductById_handler_v1.RegisterGetProductByIdHandler(echo, log, ctx))
 	if err != nil {
 		return err
 	}
