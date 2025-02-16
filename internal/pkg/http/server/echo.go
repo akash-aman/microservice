@@ -26,7 +26,7 @@ func NewEchoServer() *echo.Echo {
 	return e
 }
 
-func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.ILogger, cfg *EchoConfig) error {
+func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.Zapper, cfg *EchoConfig) error {
 
 	/**
 	 * Configure the echo server.

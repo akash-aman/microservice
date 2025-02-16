@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"context"
 	"log"
 
 	"go.uber.org/zap"
@@ -35,24 +34,22 @@ type ILogger[T any] interface {
 	/**
 	 * Structured logging methods (key-value pairs)
 	 */
-	Info(ctx context.Context, msg string, fields ...T)
-	Error(ctx context.Context, msg string, fields ...T)
-	Debug(ctx context.Context, msg string, fields ...T)
-	Warn(ctx context.Context, msg string, fields ...T)
-	Panic(ctx context.Context, msg string, fields ...T)
-	Fatal(ctx context.Context, msg string, fields ...T)
-
-	AddTraceAttribute(ctx context.Context, msg string, fields ...T)
+	Info(msg string, fields ...T)
+	Error(msg string, fields ...T)
+	Debug(msg string, fields ...T)
+	Warn(msg string, fields ...T)
+	Panic(msg string, fields ...T)
+	Fatal(msg string, fields ...T)
 
 	/**
 	 * Format logging methods (printf style)
 	 */
-	Infof(ctx context.Context, format string, args ...interface{})
-	Errorf(ctx context.Context, format string, args ...interface{})
-	Debugf(ctx context.Context, format string, args ...interface{})
-	Warnf(ctx context.Context, format string, args ...interface{})
-	Panicf(ctx context.Context, format string, args ...interface{})
-	Fatalf(ctx context.Context, format string, args ...interface{})
+	Infof(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
+	Warnf(format string, args ...interface{})
+	Panicf(format string, args ...interface{})
+	Fatalf(format string, args ...interface{})
 
 	Sync()
 }
@@ -65,7 +62,9 @@ func InitLogger[T any](cfg *LoggerConfig) ILogger[T] {
 		log.Fatal("LoggerConfig is nil. Ensure it is properly initialized.")
 	}
 
-	switch any(new(T)).(type) {
+	var sample T
+
+	switch any(sample).(type) {
 	case zap.Field:
 		return any(newZapLogger(cfg)).(ILogger[T])
 	case interface{}:

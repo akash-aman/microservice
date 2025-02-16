@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+
 	"google.golang.org/grpc/credentials"
 
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -33,7 +34,7 @@ type OtelConfig struct {
 
 type OtelCleanUp func(context.Context) error
 
-func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelCleanUp {
+func InitTracer(ctx context.Context, conf *OtelConfig, log logger.Zapper) OtelCleanUp {
 
 	if collectorURL == "" {
 		collectorURL = fmt.Sprintf("%s%s", conf.Host, conf.Port)

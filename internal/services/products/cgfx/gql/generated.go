@@ -49,6 +49,7 @@ type ResolverRoot interface {
 
 type DirectiveRoot struct {
 	HasPermissions func(ctx context.Context, obj any, next graphql.Resolver, permissions []string) (res any, err error)
+	HasRole        func(ctx context.Context, obj any, next graphql.Resolver, permission string) (res any, err error)
 }
 
 type ComplexityRoot struct {
@@ -527,6 +528,34 @@ func (ec *executionContext) dir_hasPermissions_argsPermissions(
 	}
 
 	var zeroVal []string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) dir_hasRole_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.dir_hasRole_argsPermission(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["permission"] = arg0
+	return args, nil
+}
+func (ec *executionContext) dir_hasRole_argsPermission(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["permission"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("permission"))
+	if tmp, ok := rawArgs["permission"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
 	return zeroVal, nil
 }
 
@@ -2003,8 +2032,35 @@ func (ec *executionContext) _Query_orders(ctx context.Context, field graphql.Col
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Orders(rctx, fc.Args["after"].(*entgql.Cursor[uuid.UUID]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[uuid.UUID]), fc.Args["last"].(*int), fc.Args["orderBy"].([]*gen.OrderOrder), fc.Args["where"].(*gen.OrderWhereInput))
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Orders(rctx, fc.Args["after"].(*entgql.Cursor[uuid.UUID]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[uuid.UUID]), fc.Args["last"].(*int), fc.Args["orderBy"].([]*gen.OrderOrder), fc.Args["where"].(*gen.OrderWhereInput))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			permission, err := ec.unmarshalNString2string(ctx, "READ_ORDERS")
+			if err != nil {
+				var zeroVal *gen.OrderConnection
+				return zeroVal, err
+			}
+			if ec.directives.HasRole == nil {
+				var zeroVal *gen.OrderConnection
+				return zeroVal, errors.New("directive hasRole is not implemented")
+			}
+			return ec.directives.HasRole(ctx, nil, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*gen.OrderConnection); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *products/cgfx/ent/gen.OrderConnection`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2066,8 +2122,35 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx, fc.Args["after"].(*entgql.Cursor[uuid.UUID]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[uuid.UUID]), fc.Args["last"].(*int), fc.Args["orderBy"].([]*gen.UserOrder), fc.Args["where"].(*gen.UserWhereInput))
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Users(rctx, fc.Args["after"].(*entgql.Cursor[uuid.UUID]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[uuid.UUID]), fc.Args["last"].(*int), fc.Args["orderBy"].([]*gen.UserOrder), fc.Args["where"].(*gen.UserWhereInput))
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			permission, err := ec.unmarshalNString2string(ctx, "READ_ORDERS")
+			if err != nil {
+				var zeroVal *gen.UserConnection
+				return zeroVal, err
+			}
+			if ec.directives.HasRole == nil {
+				var zeroVal *gen.UserConnection
+				return zeroVal, errors.New("directive hasRole is not implemented")
+			}
+			return ec.directives.HasRole(ctx, nil, directive0, permission)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*gen.UserConnection); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *products/cgfx/ent/gen.UserConnection`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)

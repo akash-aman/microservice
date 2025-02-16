@@ -20,7 +20,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.ILogger, config *conf.Config, gqlsrv *http.Server, otelCleanUp otel.OtelCleanUp, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Zapper, config *conf.Config, gqlsrv *http.Server, otelCleanUp otel.OtelCleanUp, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

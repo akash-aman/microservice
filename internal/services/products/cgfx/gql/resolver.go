@@ -14,7 +14,8 @@ func NewSchema(client *gen.Client) graphql.ExecutableSchema {
 	return NewExecutableSchema(Config{
 		Resolvers: &Resolver{client},
 		Directives: DirectiveRoot{
-			HasPermissions: HasPermission(),
+			HasPermissions: HasPermission(client),
+			HasRole:        HasRole(client),
 		},
 	})
 }

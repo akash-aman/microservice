@@ -19,7 +19,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogger, conf *conf.GraphQLConfig, server *http.Server) error {
+func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zapper, conf *conf.GraphQLConfig, server *http.Server) error {
 
 	if conf == nil {
 		return errors.New("graphQL config not loaded properly")

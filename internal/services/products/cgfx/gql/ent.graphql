@@ -260,7 +260,7 @@ type Query {
     Filtering options for Orders returned from the connection.
     """
     where: OrderWhereInput
-  ): OrderConnection!
+  ): OrderConnection! @hasRole(permission: "READ_ORDERS")
   """
   This is the single user
   """
@@ -294,7 +294,7 @@ type Query {
     Filtering options for Users returned from the connection.
     """
     where: UserWhereInput
-  ): UserConnection!
+  ): UserConnection! @hasRole(permission: "READ_ORDERS")
 }
 """
 The builtin Time type

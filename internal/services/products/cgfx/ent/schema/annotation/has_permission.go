@@ -40,3 +40,16 @@ func HasPermissions(permissions []string) entgql.Directive {
 		},
 	)
 }
+
+func HasRole(permission string) entgql.Directive {
+	return entgql.NewDirective(
+		"hasRole",
+		&ast.Argument{
+			Name: "permission",
+			Value: &ast.Value{
+				Raw:  permission,
+				Kind: ast.StringValue,
+			},
+		},
+	)
+}

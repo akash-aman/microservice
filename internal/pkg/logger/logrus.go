@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"context"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -37,50 +36,46 @@ func getLogrusLevel(level string) logrus.Level {
 	return logrus.InfoLevel
 }
 
-func (l *logrusLogger) AddTraceAttribute(ctx context.Context, msg string, fields ...interface{}) {
-
-}
-
-func (l *logrusLogger) Info(ctx context.Context, msg string, fields ...interface{}) {
+func (l *logrusLogger) Info(msg string, fields ...interface{}) {
 	l.logger.Info(fields...)
 }
 
-func (l *logrusLogger) Error(ctx context.Context, msg string, fields ...interface{}) {
+func (l *logrusLogger) Error(msg string, fields ...interface{}) {
 	l.logger.Error(fields...)
 }
 
-func (l *logrusLogger) Debug(ctx context.Context, msg string, fields ...interface{}) {
+func (l *logrusLogger) Debug(msg string, fields ...interface{}) {
 	l.logger.Debug(fields...)
 }
 
-func (l *logrusLogger) Warn(ctx context.Context, msg string, fields ...interface{}) {
+func (l *logrusLogger) Warn(msg string, fields ...interface{}) {
 	l.logger.Warn(fields...)
 }
 
-func (l *logrusLogger) Panic(ctx context.Context, msg string, fields ...interface{}) {
+func (l *logrusLogger) Panic(msg string, fields ...interface{}) {
 	l.logger.Panic(fields...)
 }
 
-func (l *logrusLogger) Fatal(ctx context.Context, msg string, fields ...interface{}) {
+func (l *logrusLogger) Fatal(msg string, fields ...interface{}) {
 	l.logger.Fatal(fields...)
 }
 
-func (l *logrusLogger) Infof(ctx context.Context, format string, args ...interface{}) {
+func (l *logrusLogger) Infof(format string, args ...interface{}) {
 	l.logger.Infof(format, args...)
 }
-func (l *logrusLogger) Errorf(ctx context.Context, format string, args ...interface{}) {
+func (l *logrusLogger) Errorf(format string, args ...interface{}) {
 	l.logger.Errorf(format, args...)
 }
-func (l *logrusLogger) Debugf(ctx context.Context, format string, args ...interface{}) {
+func (l *logrusLogger) Debugf(format string, args ...interface{}) {
 	l.logger.Debugf(format, args...)
 }
-func (l *logrusLogger) Warnf(ctx context.Context, format string, args ...interface{}) {
+func (l *logrusLogger) Warnf(format string, args ...interface{}) {
 	l.logger.Warnf(format, args...)
 }
-func (l *logrusLogger) Panicf(ctx context.Context, format string, args ...interface{}) {
+func (l *logrusLogger) Panicf(format string, args ...interface{}) {
 	l.logger.Panicf(format, args...)
 }
-func (l *logrusLogger) Fatalf(ctx context.Context, format string, args ...interface{}) {
+func (l *logrusLogger) Fatalf(format string, args ...interface{}) {
 	l.logger.Fatalf(format, args...)
 }
 

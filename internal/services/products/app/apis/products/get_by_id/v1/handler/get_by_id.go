@@ -10,12 +10,12 @@ import (
 )
 
 type GetProductByIdHandler struct {
-	log  logger.ILogger
+	log  logger.Zapper
 	echo *echo.Echo
 	ctx  context.Context
 }
 
-func RegisterProductHandler(echo *echo.Echo, log logger.ILogger, ctx context.Context) *GetProductByIdHandler {
+func RegisterProductHandler(echo *echo.Echo, log logger.Zapper, ctx context.Context) *GetProductByIdHandler {
 	return &GetProductByIdHandler{
 		log:  log,
 		echo: echo,

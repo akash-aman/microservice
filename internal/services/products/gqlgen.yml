@@ -23,7 +23,12 @@ autobind:
 
 # This section declares type mapping between the GraphQL and Go type systems.
 models:
-  # Defines the ID field as Go 'UUID'.
+  User:
+    model:
+      - products/cgfx/ent/gen.User
+  Order:
+    model:
+      - products/cgfx/ent/gen.Order
   UUID:
     model:
       - products/cgfx/ent/schema/uuidgql.UUID
@@ -34,7 +39,6 @@ models:
     model:
       - products/cgfx/ent/schema/uuidgql.UUID
       #- github.com/99designs/gqlgen/graphql.IntID
-
   Uint64:
     model:
       - github.com/99designs/gqlgen/graphql.Uint64

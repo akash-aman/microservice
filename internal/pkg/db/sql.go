@@ -49,7 +49,7 @@ func (c *SQLConfig) GetMySqlDSN() string {
 	)
 }
 
-func NewConnectPool(dbconf *SQLConfig, log logger.ILogger) *sql.DB {
+func NewConnectPool(dbconf *SQLConfig, log logger.Zapper) *sql.DB {
 	db, err := sql.Open("mysql", dbconf.GetMySqlDSN())
 	if err != nil {
 		log.Errorf("error in connecting to the database %v", err)
@@ -71,7 +71,7 @@ func NewConnectPool(dbconf *SQLConfig, log logger.ILogger) *sql.DB {
 	return db
 }
 
-func NewOtelDBConnectionPool(dbconf *SQLConfig, log logger.ILogger) *sql.DB {
+func NewOtelDBConnectionPool(dbconf *SQLConfig, log logger.Zapper) *sql.DB {
 
 	driverName, err := otelsql.Register("mysql", otelsql.WithAttributes(
 		semconv.DBSystemMySQL,
