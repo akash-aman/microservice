@@ -2,24 +2,34 @@ package logger
 
 /**
  * https://www.youtube.com/watch?v=I2mWnh66Bkg
- * 
+ * https://betterstack.com/community/guides/logging/go/zap/
+ * https://github.com/uptrace/opentelemetry-go-extra/tree/main/otelzap
+ * https://uptrace.dev/get/opentelemetry-go#exporting-logs
  * Need fixes according to above.
  */
 import (
+	"context"
 	"os"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 type zapLogger struct {
-	logger *zap.Logger
+	logger *otelzap.Logger
 }
 
-func newZapLogger(cfg *LoggerConfig) ILogger {
+type Zapper = ILogger[zap.Field]
+
+func newZapLogger(cfg *LoggerConfig, provider *sdklog.LoggerProvider) Zapper {
 	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = "timestamp"
 	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderCfg.CallerKey = "caller"
+	encoderCfg.EncodeCaller = zapcore.FullCallerEncoder
+
 	outputPaths := []string{"stderr"}
 	errorOutputPaths := []string{"stderr"}
 	if cfg.FileLogging {
@@ -32,7 +42,7 @@ func newZapLogger(cfg *LoggerConfig) ILogger {
 		Development:       os.Getenv("APP_ENV") != "production",
 		DisableCaller:     false,
 		DisableStacktrace: false,
-		Encoding:          "console",
+		Encoding:          cfg.Encoding,
 		EncoderConfig:     encoderCfg,
 		OutputPaths:       outputPaths,
 		ErrorOutputPaths:  errorOutputPaths,
@@ -41,9 +51,17 @@ func newZapLogger(cfg *LoggerConfig) ILogger {
 		},
 	}
 
-	logger := zap.Must(config.Build())
+	logger := zap.Must(config.Build(zap.AddCallerSkip(1)))
 
-	return &zapLogger{logger: logger}
+	otelLogger := otelzap.New(
+		logger,
+		otelzap.WithLoggerProvider(provider),
+		//otelzap.WithCaller(true),
+		// otelzap.WithExtraFields(
+		// 	zap.String("caller",helper.Caller(10)),
+		// ),
+	)
+	return &zapLogger{logger: otelLogger}
 }
 
 func getZapLevel(level string) zapcore.Level {
@@ -62,47 +80,52 @@ func getZapLevel(level string) zapcore.Level {
 }
 
 // Structured logging methods
-func (l *zapLogger) Info(args ...interface{}) {
-	l.logger.Info("", zap.Any("value", args))
+func (l *zapLogger) Info(ctx context.Context, msg string, fields ...zap.Field) {
+	l.logger.Ctx(ctx).Info(msg, fields...)
 }
 
-func (l *zapLogger) Error(args ...interface{}) {
-	l.logger.Error("", zap.Any("value", args))
+func (l *zapLogger) Error(ctx context.Context, msg string, fields ...zap.Field) {
+	l.logger.Ctx(ctx).Error(msg, fields...)
 }
 
-func (l *zapLogger) Debug(args ...interface{}) {
-	l.logger.Debug("", zap.Any("value", args))
+func (l *zapLogger) Debug(ctx context.Context, msg string, fields ...zap.Field) {
+	l.logger.Ctx(ctx).Debug(msg, fields...)
 }
 
-func (l *zapLogger) Warn(args ...interface{}) {
-	l.logger.Warn("", zap.Any("value", args))
+func (l *zapLogger) Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	l.logger.Ctx(ctx).Warn(msg, fields...)
 }
 
-func (l *zapLogger) Panic(args ...interface{}) {
-	l.logger.Panic("", zap.Any("value", args))
+func (l *zapLogger) Panic(ctx context.Context, msg string, fields ...zap.Field) {
+	l.logger.Ctx(ctx).Panic(msg, fields...)
 }
 
-func (l *zapLogger) Fatal(args ...interface{}) {
-	l.logger.Fatal("", zap.Any("value", args))
+func (l *zapLogger) Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+	l.logger.Ctx(ctx).Fatal(msg, fields...)
 }
 
-func (l *zapLogger) Infof(format string, args ...interface{}) {
-	l.logger.Sugar().Infof(format, args...)
+func (l *zapLogger) Infof(ctx context.Context, format string, args ...interface{}) {
+	l.logger.Ctx(ctx).Sugar().Infof(format, args...)
 }
-func (l *zapLogger) Errorf(format string, args ...interface{}) {
-	l.logger.Sugar().Errorf(format, args...)
+
+func (l *zapLogger) Errorf(ctx context.Context, format string, args ...interface{}) {
+	l.logger.Ctx(ctx).Sugar().Errorf(format, args...)
 }
-func (l *zapLogger) Debugf(format string, args ...interface{}) {
-	l.logger.Sugar().Debugf(format, args...)
+
+func (l *zapLogger) Debugf(ctx context.Context, format string, args ...interface{}) {
+	l.logger.Ctx(ctx).Sugar().Debugf(format, args...)
 }
-func (l *zapLogger) Warnf(format string, args ...interface{}) {
-	l.logger.Sugar().Warnf(format, args...)
+
+func (l *zapLogger) Warnf(ctx context.Context, format string, args ...interface{}) {
+	l.logger.Ctx(ctx).Sugar().Warnf(format, args...)
 }
-func (l *zapLogger) Panicf(format string, args ...interface{}) {
-	l.logger.Sugar().Panicf(format, args...)
+
+func (l *zapLogger) Panicf(ctx context.Context, format string, args ...interface{}) {
+	l.logger.Ctx(ctx).Sugar().Panicf(format, args...)
 }
-func (l *zapLogger) Fatalf(format string, args ...interface{}) {
-	l.logger.Sugar().Fatalf(format, args...)
+
+func (l *zapLogger) Fatalf(ctx context.Context, format string, args ...interface{}) {
+	l.logger.Ctx(ctx).Sugar().Fatalf(format, args...)
 }
 
 func (l *zapLogger) Sync() { l.logger.Sync() }

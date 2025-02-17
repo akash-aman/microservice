@@ -7,10 +7,13 @@ package main
 
 import (
 	"log"
+	"reflect"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 const (
@@ -22,6 +25,7 @@ const (
 )
 
 func main() {
+	rt := reflect.TypeOf(uuid.UUID{})
 	ex, err := entgql.NewExtension(
 		entgql.WithSchemaGenerator(),
 		entgql.WithSchemaPath(graphQLSchemaPath),
@@ -37,8 +41,15 @@ func main() {
 		entc.Extensions(ex),
 	}
 	if err := entc.Generate(entitySchemaPath, &gen.Config{
-		Target:  targetOutputPath,
-		Package: outputPackageName,
+		Templates: entgql.AllTemplates,
+		Target:    targetOutputPath,
+		Package:   outputPackageName,
+		IDType: &field.TypeInfo{
+			Type:    field.TypeUUID,
+			Ident:   rt.String(),
+			PkgPath: rt.PkgPath(),
+		},
+
 		Features: []gen.Feature{
 			gen.FeatureModifier,
 		},

@@ -26,7 +26,7 @@ func NewEchoServer() *echo.Echo {
 	return e
 }
 
-func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.ILogger, cfg *EchoConfig) error {
+func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.Zapper, cfg *EchoConfig) error {
 
 	/**
 	 * Configure the echo server.
@@ -39,13 +39,13 @@ func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.ILogger, cfg
 		for {
 			select {
 			case <-ctx.Done():
-				log.Infof("Shutting down HTTP PORT: {%s}", cfg.Port)
+				log.Infof(ctx, "Shutting down HTTP PORT: {%s}", cfg.Port)
 				err := echo.Shutdown(ctx)
 				if err != nil {
-					log.Errorf("Error shutting down HTTP server {%v}", err)
+					log.Errorf(ctx, "Error shutting down HTTP server {%v}", err)
 					return
 				}
-				log.Info("HTTP server shutdown gracefully")
+				log.Info(ctx, "HTTP server shutdown gracefully")
 				return
 			}
 		}

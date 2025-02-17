@@ -1,5 +1,8 @@
 package inits
 
+/**
+ * https://github.com/cmelgarejo/go-gql-server/blob/master/internal/handlers/gql.go
+ */
 import (
 	"context"
 	"errors"
@@ -17,9 +20,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/websocket"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.uber.org/zap"
 )
 
-func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogger, conf *conf.GraphQLConfig, server *http.Server) error {
+func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zapper, conf *conf.GraphQLConfig, server *http.Server) error {
 
 	if conf == nil {
 		return errors.New("graphQL config not loaded properly")
@@ -51,13 +55,13 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.ILogg
 		<-ctx.Done()
 		err := server.Shutdown(context.Background())
 		if err != nil {
-			log.Errorf("Error shutting down GraphQL server: %v", err)
+			log.Error(ctx, "Error shutting down GraphQL server", zap.Error(err))
 		} else {
-			log.Infof("GraphQL server shut down gracefully")
+			log.Info(ctx, "GraphQL server shut down gracefully")
 		}
 	}()
 
-	log.Infof("Starting GraphQL Server on port %s", conf.Port)
+	log.Info(ctx, "Starting GraphQL Server", zap.String("port", conf.Port))
 
 	return server.ListenAndServe()
 }

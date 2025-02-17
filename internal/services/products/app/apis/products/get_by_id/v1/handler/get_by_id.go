@@ -10,12 +10,12 @@ import (
 )
 
 type GetProductByIdHandler struct {
-	log  logger.ILogger
+	log  logger.Zapper
 	echo *echo.Echo
 	ctx  context.Context
 }
 
-func RegisterProductHandler(echo *echo.Echo, log logger.ILogger, ctx context.Context) *GetProductByIdHandler {
+func RegisterGetProductByIdHandler(echo *echo.Echo, log logger.Zapper, ctx context.Context) *GetProductByIdHandler {
 	return &GetProductByIdHandler{
 		log:  log,
 		echo: echo,
@@ -23,9 +23,9 @@ func RegisterProductHandler(echo *echo.Echo, log logger.ILogger, ctx context.Con
 	}
 }
 
-func (c *GetProductByIdHandler) Handle(ctx context.Context, cmd *model_v1.GetProductById) (*dtos_v1.ProductResponseDto, error) {
+func (c *GetProductByIdHandler) Handle(ctx context.Context, cmd *model_v1.GetProductById) (*dtos_v1.GetProductByIdResponseDto, error) {
 
-	data := &dtos_v1.ProductResponseDto{
+	data := &dtos_v1.GetProductByIdResponseDto{
 		ID:          "0",
 		Name:        "Sample Product",
 		Description: "This is a sample product description.",

@@ -1,4 +1,4 @@
-package otel
+package tracer
 
 /**
  * Reference: https://signoz.io/docs/instrumentation/opentelemetry-golang/
@@ -7,37 +7,23 @@ package otel
 import (
 	"context"
 	"fmt"
-	"os"
-	"pkg/logger"
+	"pkg/otel/conf"
+
+	"log"
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+
 	"google.golang.org/grpc/credentials"
 
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-var (
-	collectorURL = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-)
+func ConfigOpenTelementryTracer(ctx context.Context, conf *conf.OtelConfig, res *resource.Resource) {
 
-type OtelConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	Service  string `mapstructure:"service"`
-	Insecure bool   `mapstructure:"insecure"`
-}
-
-type OtelCleanUp func(context.Context) error
-
-func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelCleanUp {
-
-	if collectorURL == "" {
-		collectorURL = fmt.Sprintf("%s%s", conf.Host, conf.Port)
-	}
+	collectorURL := fmt.Sprintf("%s%s", conf.Host, conf.Grpc)
 
 	var secureOption otlptracegrpc.Option
 
@@ -58,22 +44,12 @@ func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelC
 	if err != nil {
 		log.Fatalf("Failed to create exporter: %v", err)
 	}
-	resources, err := resource.New(
-		context.Background(),
-		resource.WithAttributes(
-			attribute.String("service.name", conf.Service),
-			attribute.String("library.language", "go"),
-		),
-	)
-	if err != nil {
-		log.Fatalf("Could not set resources: %v", err)
-	}
 
 	otel.SetTracerProvider(
 		sdktrace.NewTracerProvider(
 			sdktrace.WithSampler(sdktrace.AlwaysSample()),
 			sdktrace.WithBatcher(exporter),
-			sdktrace.WithResource(resources),
+			sdktrace.WithResource(res),
 		),
 	)
 
@@ -81,11 +57,9 @@ func InitTracer(ctx context.Context, conf *OtelConfig, log logger.ILogger) OtelC
 		<-ctx.Done()
 		err = exporter.Shutdown(context.Background())
 		if err != nil {
-			log.Errorf("Error exiting open-telemetry %v", err)
+			log.Fatalf("Error exiting open-telemetry tracer %v", err)
 		} else {
-			log.Info("open-telemetry exited gracefully")
+			log.Print("open-telemetry tracer exited gracefully")
 		}
 	}()
-
-	return exporter.Shutdown
 }

@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-playground/validator"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 )
 
 /**
@@ -24,7 +25,7 @@ import (
 func main() {
 	fx.New(
 		fx.Provide(
-			logger.InitLogger,
+			logger.InitLogger[zap.Field],
 			conf.InitConfig,
 			http.NewContext,
 			validator.New,
@@ -32,10 +33,12 @@ func main() {
 			httpServer.NewEchoServer,
 			inits.NewEntClient,
 			gql.NewGQLServer,
-			otel.InitTracer,
+			otel.InitOpentelemetry,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),
 		fx.Invoke(inits.ConfigEndpoints),
+		fx.Invoke(inits.ConfigSwagger),
+		fx.Invoke(inits.ConfigMiddlewares),
 	).Run()
 }
