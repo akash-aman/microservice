@@ -1,7 +1,7 @@
 package inits
 
 import (
-	"pkg/otel"
+	"pkg/otel/conf"
 	"products/app/core/constants"
 	"strings"
 
@@ -10,7 +10,7 @@ import (
 	otelMiddleware "go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 )
 
-func ConfigMiddlewares(e *echo.Echo, otew *otel.OtelConfig) {
+func ConfigMiddlewares(e *echo.Echo, otew *conf.OtelConfig) {
 
 	e.HideBanner = false
 

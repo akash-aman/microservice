@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"pkg/logger"
-	ot "pkg/otel"
+	ot "pkg/otel/tracer"
 
 	dtos_v1 "products/app/apis/products/get_by_id/v1/dtos"
 	model_v1 "products/app/apis/products/get_by_id/v1/model"
@@ -26,7 +26,7 @@ func getProductById(validator *validator.Validate, log logger.Zapper, _ context.
 	return func(c echo.Context) error {
 
 		/**
-		 * 
+		 *
 		 */
 		tracer, ctx := ot.NewTracer(c.Request().Context(), "GetProductById Controller")
 		defer tracer.End()
@@ -34,11 +34,11 @@ func getProductById(validator *validator.Validate, log logger.Zapper, _ context.
 		request := &dtos_v1.GetProductByIdRequestDto{}
 
 		/**
-		 * 
+		 *
 		 */
 		if err := c.Bind(request); err != nil {
 			errMsg := "[getProductById_handler.Bind] error in the binding request"
-			log.Errorf("Error while binding request: %v", err)
+			log.Error(ctx, "Error while binding request", zap.Error(err))
 			tracer.RecordError(err, "[getProductById_handler.Bind] error in the binding request")
 			return echo.NewHTTPError(http.StatusBadRequest, errMsg)
 		}
@@ -48,34 +48,33 @@ func getProductById(validator *validator.Validate, log logger.Zapper, _ context.
 		command := model_v1.NewGetProductById(request.ProductID)
 
 		/**
-		 * 
+		 *
 		 */
 		if err := validator.StructCtx(ctx, command); err != nil {
 			errMsg := "[getProductById_handler.StructCtx] command validation failed"
-			log.Errorf("Validation error: %v", zap.Error(err))
+			log.Error(ctx, "Validation error", zap.Error(err), zap.String("productId", request.ProductID), )
 			tracer.RecordError(err, "[getProductById_handler.StructCtx] command validation failed")
 			return echo.NewHTTPError(http.StatusBadRequest, errMsg)
 		}
 
 		/**
-		 * 
+		 *
 		 */
 		result, err := mediatr.Send[*model_v1.GetProductById, *dtos_v1.GetProductByIdResponseDto](ctx, command)
 
-		
 		/**
-		 * 
+		 *
 		 */
 		if err != nil {
-			log.Errorf("Error processing request: %v", err)
+			log.Error(ctx, "Error processing request", zap.Error(err))
 			tracer.RecordError(err, "Error processing request")
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
 
 		/**
-		 * 
+		 *
 		 */
-		log.Infof("Product retrieved successfully, id: %d", result.ID)
+		log.Info(ctx, "Product retrieved successfully", zap.String("productId", result.ID))
 
 		return c.JSON(http.StatusOK, result)
 	}

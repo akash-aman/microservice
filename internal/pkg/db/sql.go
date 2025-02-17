@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"pkg/logger"
@@ -10,7 +11,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-	"go.uber.org/zap"
 )
 
 type SQLConfig struct {
@@ -49,20 +49,20 @@ func (c *SQLConfig) GetMySqlDSN() string {
 	)
 }
 
-func NewConnectPool(dbconf *SQLConfig, log logger.Zapper) *sql.DB {
+func NewConnectPool(ctx context.Context, dbconf *SQLConfig, log logger.Zapper) *sql.DB {
 	db, err := sql.Open("mysql", dbconf.GetMySqlDSN())
 	if err != nil {
-		log.Errorf("error in connecting to the database %v", err)
+		log.Errorf(ctx, "error in connecting to the database %v", err)
 		return nil
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Errorf("unable to connect to the database: %v", err)
+		log.Errorf(ctx, "unable to connect to the database: %v", err)
 		return nil
 	}
 
-	log.Infof("database connected successfully")
+	log.Infof(ctx, "database connected successfully")
 
 	db.SetMaxOpenConns(dbconf.MaxOpenConn)
 	db.SetMaxIdleConns(dbconf.MaxIdleConn)
@@ -71,21 +71,21 @@ func NewConnectPool(dbconf *SQLConfig, log logger.Zapper) *sql.DB {
 	return db
 }
 
-func NewOtelDBConnectionPool(dbconf *SQLConfig, log logger.Zapper) *sql.DB {
+func NewOtelDBConnectionPool(ctx context.Context, dbconf *SQLConfig, log logger.Zapper) *sql.DB {
 
 	driverName, err := otelsql.Register("mysql", otelsql.WithAttributes(
 		semconv.DBSystemMySQL,
 	))
 
 	if err != nil {
-		log.Errorf("error in registering OpenTelemetry SQL driver: %v", err)
+		log.Errorf(ctx, "error in registering OpenTelemetry SQL driver: %v", err)
 		return nil
 	}
 
 	// Open the database connection using the wrapped driver
 	db, err := sql.Open(driverName, dbconf.GetMySqlDSN())
 	if err != nil {
-		log.Errorf("error in connecting to the database %v", err)
+		log.Errorf(ctx, "error in connecting to the database %v", err)
 		return nil
 	}
 
@@ -95,18 +95,18 @@ func NewOtelDBConnectionPool(dbconf *SQLConfig, log logger.Zapper) *sql.DB {
 	))
 
 	if err != nil {
-		log.Errorf("error in registering DB stats metrics %v", err)
+		log.Errorf(ctx, "error in registering DB stats metrics %v", err)
 		return nil
 	}
 
 	// Test the connection
 	err = db.Ping()
 	if err != nil {
-		log.Errorf("unable to connect to the database: %v", err)
+		log.Errorf(ctx, "unable to connect to the database: %v", err)
 		return nil
 	}
 
-	log.Info("database connected successfully %s", zap.String("sdfdsf", "key"))
+	log.Info(ctx, "database connected successfully %s")
 
 	// Set database connection pool parameters
 	db.SetMaxOpenConns(dbconf.MaxOpenConn)

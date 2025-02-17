@@ -1,8 +1,10 @@
 package logger
 
 import (
+	"context"
 	"log"
 
+	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.uber.org/zap"
 )
 
@@ -34,22 +36,22 @@ type ILogger[T any] interface {
 	/**
 	 * Structured logging methods (key-value pairs)
 	 */
-	Info(msg string, fields ...T)
-	Error(msg string, fields ...T)
-	Debug(msg string, fields ...T)
-	Warn(msg string, fields ...T)
-	Panic(msg string, fields ...T)
-	Fatal(msg string, fields ...T)
+	Info(ctx context.Context, msg string, fields ...T)
+	Error(ctx context.Context, msg string, fields ...T)
+	Debug(ctx context.Context, msg string, fields ...T)
+	Warn(ctx context.Context, msg string, fields ...T)
+	Panic(ctx context.Context, msg string, fields ...T)
+	Fatal(ctx context.Context, msg string, fields ...T)
 
 	/**
 	 * Format logging methods (printf style)
 	 */
-	Infof(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-	Debugf(format string, args ...interface{})
-	Warnf(format string, args ...interface{})
-	Panicf(format string, args ...interface{})
-	Fatalf(format string, args ...interface{})
+	Infof(ctx context.Context, format string, args ...interface{})
+	Errorf(ctx context.Context, format string, args ...interface{})
+	Debugf(ctx context.Context, format string, args ...interface{})
+	Warnf(ctx context.Context, format string, args ...interface{})
+	Panicf(ctx context.Context, format string, args ...interface{})
+	Fatalf(ctx context.Context, format string, args ...interface{})
 
 	Sync()
 }
@@ -57,7 +59,7 @@ type ILogger[T any] interface {
 /**
  * Logger factory function
  */
-func InitLogger[T any](cfg *LoggerConfig) ILogger[T] {
+func InitLogger[T any](cfg *LoggerConfig, provider *sdklog.LoggerProvider) ILogger[T] {
 	if cfg == nil {
 		log.Fatal("LoggerConfig is nil. Ensure it is properly initialized.")
 	}
@@ -66,7 +68,7 @@ func InitLogger[T any](cfg *LoggerConfig) ILogger[T] {
 
 	switch any(sample).(type) {
 	case zap.Field:
-		return any(newZapLogger(cfg)).(ILogger[T])
+		return any(newZapLogger(cfg, provider)).(ILogger[T])
 	case interface{}:
 		return any(newLogrusLogger(cfg)).(ILogger[T])
 	}

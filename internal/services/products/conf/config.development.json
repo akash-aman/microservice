@@ -12,6 +12,8 @@
     "telemetry": {
         "service": "products",
         "host": "localhost",
+        "grpc": ":4317",
+        "http": ":4318",
         "port": ":4317",
         "insecure": true
     },

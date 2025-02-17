@@ -11,7 +11,7 @@ import (
 	"pkg/gql"
 	http "pkg/http/server"
 	"pkg/logger"
-	"pkg/otel"
+	"pkg/otel/conf"
 	"products/app/core/models"
 	"runtime"
 
@@ -33,7 +33,7 @@ type Config struct {
 	Logger  *logger.LoggerConfig `mapstructure:"logger" validate:"required"`
 	Sql     *db.SQLConfig        `mapstructure:"sql" validate:"required"`
 	GraphQL *gql.GraphQLConfig   `mapstructure:"graphql" validate:"required"`
-	Otel    *otel.OtelConfig     `mapstructure:"telemetry" validate:"required"`
+	Otel    *conf.OtelConfig     `mapstructure:"telemetry" validate:"required"`
 }
 
 /**
@@ -48,7 +48,7 @@ type Config struct {
  * - Returns the loaded Config struct, EchoConfig struct, and an error if any occurs during the process.
  */
 
-func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfig, *gql.GraphQLConfig, *otel.OtelConfig, error) {
+func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfig, *gql.GraphQLConfig, *conf.OtelConfig, error) {
 	env := os.Getenv("APP_ENV")
 	if env == "" {
 		env = "development"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"pkg/otel"
+	otel "pkg/otel/tracer"
 	"products/cgfx/ent/gen"
 
 	"github.com/99designs/gqlgen/graphql"
