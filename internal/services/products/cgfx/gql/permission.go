@@ -8,6 +8,7 @@ import (
 	"products/cgfx/ent/gen"
 
 	"github.com/99designs/gqlgen/graphql"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 /**
@@ -39,6 +40,11 @@ func HasRole(client *gen.Client) func(ctx context.Context, obj interface{}, next
 		// For example, you can extract user information from the context and check permissions
 		tracer, ctx := otel.NewTracer(ctx, "HasRole Controller")
 		defer tracer.End()
+
+		// Extract the GraphQL query from the context
+		if gqlRequestContext := graphql.GetOperationContext(ctx); gqlRequestContext != nil {
+			tracer.AddAttributes(attribute.String("graphql.query", gqlRequestContext.RawQuery))
+		}
 
 		// Your Conditional Logic To Authorize
 		if true {

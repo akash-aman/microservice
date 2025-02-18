@@ -14,17 +14,17 @@ import (
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id uuid.UUID) (gen.Noder, error) {
-	return r.client.Noder(ctx, id)
+	return r.Client.Noder(ctx, id)
 }
 
 // Nodes is the resolver for the nodes field.
 func (r *queryResolver) Nodes(ctx context.Context, ids []uuid.UUID) ([]gen.Noder, error) {
-	return r.client.Noders(ctx, ids)
+	return r.Client.Noders(ctx, ids)
 }
 
 // Orders is the resolver for the orders field.
 func (r *queryResolver) Orders(ctx context.Context, after *entgql.Cursor[uuid.UUID], first *int, before *entgql.Cursor[uuid.UUID], last *int, orderBy []*gen.OrderOrder, where *gen.OrderWhereInput) (*gen.OrderConnection, error) {
-	return r.client.Order.Query().
+	return r.Client.Order.Query().
 		Paginate(ctx, after, first, before, last,
 			gen.WithOrderOrder(orderBy),
 			gen.WithOrderFilter(where.Filter),
@@ -33,7 +33,7 @@ func (r *queryResolver) Orders(ctx context.Context, after *entgql.Cursor[uuid.UU
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[uuid.UUID], first *int, before *entgql.Cursor[uuid.UUID], last *int, orderBy []*gen.UserOrder, where *gen.UserWhereInput) (*gen.UserConnection, error) {
-	return r.client.User.Query().
+	return r.Client.User.Query().
 		Paginate(ctx, after, first, before, last,
 			gen.WithUserOrder(orderBy),
 			gen.WithUserFilter(where.Filter),
