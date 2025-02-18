@@ -7,12 +7,12 @@ import (
 )
 
 // Resolver is the resolver root.
-type Resolver struct{ client *gen.Client }
+type Resolver struct{ Client *gen.Client }
 
 // NewSchema creates a graphql executable schema.
 func NewSchema(client *gen.Client) graphql.ExecutableSchema {
 	return NewExecutableSchema(Config{
-		Resolvers: &Resolver{client},
+		Resolvers: &Resolver{Client: client},
 		Directives: DirectiveRoot{
 			HasPermissions: HasPermission(client),
 			HasRole:        HasRole(client),

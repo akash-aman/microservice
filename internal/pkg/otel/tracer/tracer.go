@@ -21,7 +21,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func ConfigOpenTelementryTracer(ctx context.Context, conf *conf.OtelConfig, res *resource.Resource) {
+func ConfigOpenTelementryTracer(ctx context.Context, conf *conf.OtelConfig, res *resource.Resource) *sdktrace.TracerProvider {
 
 	collectorURL := fmt.Sprintf("%s%s", conf.Host, conf.Grpc)
 
@@ -45,13 +45,13 @@ func ConfigOpenTelementryTracer(ctx context.Context, conf *conf.OtelConfig, res 
 		log.Fatalf("Failed to create exporter: %v", err)
 	}
 
-	otel.SetTracerProvider(
-		sdktrace.NewTracerProvider(
-			sdktrace.WithSampler(sdktrace.AlwaysSample()),
-			sdktrace.WithBatcher(exporter),
-			sdktrace.WithResource(res),
-		),
+	traceProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithBatcher(exporter),
+		sdktrace.WithResource(res),
 	)
+
+	otel.SetTracerProvider(traceProvider)
 
 	go func() {
 		<-ctx.Done()
@@ -62,4 +62,6 @@ func ConfigOpenTelementryTracer(ctx context.Context, conf *conf.OtelConfig, res 
 			log.Print("open-telemetry tracer exited gracefully")
 		}
 	}()
+
+	return traceProvider
 }

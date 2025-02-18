@@ -18,13 +18,15 @@ import (
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
+
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 var (
 	collectorURL = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 )
 
-func InitOpentelemetry(ctx context.Context, conf *conf.OtelConfig) (*sdklog.LoggerProvider, *metric.MeterProvider) {
+func InitOpentelemetry(ctx context.Context, conf *conf.OtelConfig) (*sdklog.LoggerProvider, *sdktrace.TracerProvider, *metric.MeterProvider) {
 	if collectorURL == "" {
 		collectorURL = fmt.Sprintf("%s%s", conf.Host, conf.Port)
 	}
@@ -40,12 +42,12 @@ func InitOpentelemetry(ctx context.Context, conf *conf.OtelConfig) (*sdklog.Logg
 
 	if err != nil {
 		log.Fatalf("Could not set resources: %v", err)
-		return nil, nil
+		return nil, nil, nil
 	}
 
-	tracer.ConfigOpenTelementryTracer(ctx, conf, resources)
 	logProvider := logs.ConfigOpenTelementryLogs(ctx, conf, resources)
+	traceProvider := tracer.ConfigOpenTelementryTracer(ctx, conf, resources)
 	metricProvider := metrics.ConfigOpenTelementryMeter(ctx, conf, resources)
 
-	return logProvider, metricProvider
+	return logProvider, traceProvider, metricProvider
 }
