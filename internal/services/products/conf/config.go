@@ -12,6 +12,7 @@ import (
 	http "pkg/http/server"
 	"pkg/logger"
 	"pkg/otel/conf"
+	"pkg/websocket/gobwas"
 	"products/app/core/models"
 	"runtime"
 
@@ -28,12 +29,13 @@ func init() {
  * Config - Centralized configuration for all the service present in application
  */
 type Config struct {
-	Service *models.Service      `mapstructure:"service" validate:"required"`
-	Echo    *http.EchoConfig     `mapstructure:"echo" validate:"required"`
-	Logger  *logger.LoggerConfig `mapstructure:"logger" validate:"required"`
-	Sql     *db.SQLConfig        `mapstructure:"sql" validate:"required"`
-	GraphQL *gql.GraphQLConfig   `mapstructure:"graphql" validate:"required"`
-	Otel    *conf.OtelConfig     `mapstructure:"telemetry" validate:"required"`
+	Service  *models.Service         `mapstructure:"service" validate:"required"`
+	Echo     *http.EchoConfig        `mapstructure:"echo" validate:"required"`
+	Logger   *logger.LoggerConfig    `mapstructure:"logger" validate:"required"`
+	Sql      *db.SQLConfig           `mapstructure:"sql" validate:"required"`
+	GraphQL  *gql.GraphQLConfig      `mapstructure:"graphql" validate:"required"`
+	Otel     *conf.OtelConfig        `mapstructure:"telemetry" validate:"required"`
+	WSConfig *gobwas.WebSocketConfig `mapstructure:"websocket" validate:"required"`
 }
 
 /**
@@ -48,7 +50,7 @@ type Config struct {
  * - Returns the loaded Config struct, EchoConfig struct, and an error if any occurs during the process.
  */
 
-func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfig, *gql.GraphQLConfig, *conf.OtelConfig, error) {
+func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfig, *gql.GraphQLConfig, *conf.OtelConfig, *gobwas.WebSocketConfig, error) {
 	env := os.Getenv("APP_ENV")
 	if env == "" {
 		env = "development"
@@ -69,7 +71,7 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfi
 			d, err := CallerDirPath()
 			if err != nil {
 				log.Println("Error getting current directory:", err)
-				return nil, nil, nil, nil, nil, nil, err
+				return nil, nil, nil, nil, nil, nil, nil, err
 			}
 			configPath = d
 		}
@@ -81,17 +83,17 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfi
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Println("Error reading config file:", err)
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	if err := viper.Unmarshal(cnf); err != nil {
 		log.Println("Error unmarshalling config file:", err)
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	log.Println("Config loaded successfully from:", configPath)
 
-	return cnf, cnf.Echo, cnf.Logger, cnf.Sql, cnf.GraphQL, cnf.Otel, nil
+	return cnf, cnf.Echo, cnf.Logger, cnf.Sql, cnf.GraphQL, cnf.Otel, cnf.WSConfig, nil
 }
 
 /**

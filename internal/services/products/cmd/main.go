@@ -7,6 +7,7 @@ import (
 	httpServer "pkg/http/server"
 	"pkg/logger"
 	"pkg/otel"
+	"pkg/websocket/gobwas"
 	"products/app/inits"
 	"products/conf"
 	"products/server"
@@ -34,11 +35,14 @@ func main() {
 			inits.NewEntClient,
 			gql.NewGQLServer,
 			otel.InitOpentelemetry,
+			gobwas.NewWebSocketHander,
+			gobwas.NewWebSocketServer,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),
 		fx.Invoke(inits.ConfigEndpoints),
 		fx.Invoke(inits.ConfigSwagger),
 		fx.Invoke(inits.ConfigMiddlewares),
+		fx.Invoke(inits.InitWebsocket),
 	).Run()
 }
