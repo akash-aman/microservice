@@ -54,5 +54,19 @@
         "writeTimeout": "10s",
         "BaseRoute": "/graphql",
         "debugMode": true
+    },
+    "websocket":{
+        "port": ":5006",
+        "host": "localhost",
+        "readTimeout": "10s",
+        "writeTimeout": "10s",
+        "BaseRoute": "/ws",
+        "debugMode": true,
+        "workers": 10,
+        "queueSize": 100,
+        "preallocate": 1,
+        "ioTimeout": "10s",
+        "debugPprof": "",
+        "maxMsgSize": 1024
     }
 }
