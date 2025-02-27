@@ -28,4 +28,8 @@ func ConfigMiddlewares(e *echo.Echo, otew *conf.OtelConfig) {
 	}))
 
 	e.Use(middleware.BodyLimit(constants.BodyLimit))
+
+	e.GET("/health", func(c echo.Context) error {
+		return c.String(200, "OK")
+	})
 }
