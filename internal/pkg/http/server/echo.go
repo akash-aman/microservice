@@ -2,6 +2,9 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"pkg/discovery"
+	"pkg/helper"
 	"pkg/logger"
 	"time"
 
@@ -50,6 +53,17 @@ func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.Zapper, cfg 
 			}
 		}
 	}()
+
+	if err := discovery.RegisterServiceWithConsul(
+		ctx, "echo-http-service",
+		fmt.Sprintf("echo-http-service-%s", helper.GetMachineID()),
+		fmt.Sprintf("http://%s", "host.docker.internal"),
+		helper.GetPort(cfg.Port),
+		discovery.HTTPService,
+		log,
+	); err != nil {
+		log.Errorf(ctx, "Error registering with Consul: %v", err)
+	}
 
 	err := echo.Start(cfg.Port)
 	return err

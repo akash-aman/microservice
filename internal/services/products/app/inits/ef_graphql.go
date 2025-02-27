@@ -6,8 +6,11 @@ package inits
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"pkg/discovery"
 	conf "pkg/gql"
+	"pkg/helper"
 	"pkg/logger"
 	"products/cgfx/ent/gen"
 	"products/cgfx/gql"
@@ -47,6 +50,10 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zappe
 
 	http.Handle("/graphql", otelhttp.NewHandler(playground.Handler("Products", "/query"), "Http Query Handler Endpoint"))
 	http.Handle("/query", otelhttp.NewHandler(srv, "GraphQL Query Handler Endpoint"))
+	http.Handle("/health", otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	}), "Health Check Endpoint"))
 
 	server.Addr = conf.Port
 	server.Handler = http.DefaultServeMux
@@ -62,6 +69,18 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zappe
 	}()
 
 	log.Info(ctx, "Starting GraphQL Server", zap.String("port", conf.Port))
+
+	if err := discovery.RegisterServiceWithConsul(
+		ctx,
+		"echo-graphql-service",
+		fmt.Sprintf("echo-graphql-service-%s", helper.GetMachineID()),
+		fmt.Sprintf("http://%s", "host.docker.internal"), // conf.Port
+		helper.GetPort(conf.Port),
+		discovery.HTTPService,
+		log,
+	); err != nil {
+		log.Errorf(ctx, "Error registering with Consul: %v", err)
+	}
 
 	return server.ListenAndServe()
 }
