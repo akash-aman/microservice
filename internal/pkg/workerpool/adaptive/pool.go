@@ -1,4 +1,4 @@
-package gobwas
+package workerpool
 
 import (
 	"errors"
