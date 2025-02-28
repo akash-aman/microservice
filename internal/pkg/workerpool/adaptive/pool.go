@@ -1,4 +1,4 @@
-package workerpool
+package gobwas
 
 import (
 	"errors"
@@ -57,51 +57,47 @@ func NewPoolWithAutoScale(maxWorkers, minWorkers, queueSize int, idleTimeout tim
 }
 
 // Schedule adds a task to be executed by the worker pool.
-// If the queue is full, it tries to start a new worker.
-// If the worker limit is reached, it blocks until a worker becomes available.
+// It prioritizes starting new workers rather than queuing tasks,
+// until reaching the maximum worker count.
 func (p *Pool) Schedule(task task) {
-	// Try to add task to queue without blocking
-	select {
-	case p.queue <- task:
-		return // Task scheduled successfully
-	default:
-		// Queue is full, try to spawn a new worker
-	}
-
-	// Try to acquire worker slot
+	// First try to start a new worker if below max capacity
 	select {
 	case p.semaphore <- token{}:
-		// Worker slot acquired, start a new adaptive worker and queue the task
+		// Worker slot acquired, start a new adaptive worker
 		p.startAdaptiveWorker()
+		// Send task directly to queue
 		p.queue <- task
+		return
 	default:
-		// Worker limit reached, block until queue has space
-		p.queue <- task
+		// At max workers, try to queue the task
+		select {
+		case p.queue <- task:
+			// Task queued successfully
+			return
+		default:
+			// Queue is full, block until space is available
+			p.queue <- task
+		}
 	}
 }
 
 // ScheduleTimeout attempts to schedule a task with a timeout.
-// Returns ErrScheduleTimeout if the task couldn't be scheduled within the given timeout.
+// It prioritizes starting new workers rather than queuing tasks.
+// Returns ErrScheduleTimeout if the task couldn't be scheduled within the timeout.
 func (p *Pool) ScheduleTimeout(timeout time.Duration, task task) error {
-	// Fast path: try to enqueue directly
-	select {
-	case p.queue <- task:
-		return nil // Task scheduled successfully
-	default:
-		// Queue is full, try other approaches
-	}
-
-	// Try to start a new worker
+	// First try to start a new worker if below max capacity
 	select {
 	case p.semaphore <- token{}:
-		// Worker slot acquired, start a new worker and queue the task
+		// Worker slot acquired, start a new adaptive worker
 		p.startAdaptiveWorker()
+		// Send task directly to queue
 		p.queue <- task
 		return nil
 	default:
-		// Worker limit reached, try to queue with timeout
+		// At max workers, try to queue the task with timeout
 		select {
 		case p.queue <- task:
+			// Task queued successfully
 			return nil
 		case <-time.After(timeout):
 			return errors.New("ErrScheduleTimeout")
@@ -177,6 +173,11 @@ func (p *Pool) canTerminateWorker() bool {
 	}
 
 	return false
+}
+
+// QueueDepth returns the current number of tasks in the queue
+func (p *Pool) QueueDepth() int {
+	return len(p.queue)
 }
 
 // ActiveWorkerCount returns the current number of active workers
