@@ -62,7 +62,7 @@
         "writeTimeout": "10s",
         "BaseRoute": "/ws",
         "debugMode": true,
-        "workers": 10,
+        "workers": 100,
         "queueSize": 100,
         "preallocate": 1,
         "ioTimeout": "10s",
