@@ -1,10 +1,5 @@
 package gobwas
 
-// Package websocket provides a high-performance WebSocket server implementation
-// with clean separation between transport layer and business logic.
-//
-// https://www.freecodecamp.org/news/million-websockets-and-go-cc58418460bb/
-
 import (
 	"context"
 	"fmt"
@@ -13,9 +8,12 @@ import (
 	"pkg/logger"
 	"time"
 
+	"github.com/failsafe-go/failsafe-go"
+	"github.com/failsafe-go/failsafe-go/retrypolicy"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 	"github.com/mailru/easygo/netpoll"
+	"github.com/panjf2000/ants/v2"
 )
 
 /**
@@ -43,20 +41,19 @@ import (
 
 // WebSocketConfig holds configuration for the WebSocket server
 type WebSocketConfig struct {
-	Host        string        `mapstructure:"host" validate:"required"`
-	Port        string        `mapstructure:"port" validate:"required"`
-	Workers     int           `mapstructure:"workers" validate:"required"`
-	QueueSize   int           `mapstructure:"queueSize" validate:"required"`
-	Preallocate int           `mapstructure:"Preallocate" validate:"required"`
-	IOTimeout   time.Duration `mapstructure:"ioTimeout" validate:"required"`
-	DebugPprof  string        `mapstructure:"debugPprof"`
-	MaxMsgSize  int           `mapstructure:"maxMsgSize"`
+	Host       string        `mapstructure:"host" validate:"required"`
+	Port       string        `mapstructure:"port" validate:"required"`
+	Workers    int           `mapstructure:"workers" validate:"required"`
+	QueueSize  int           `mapstructure:"queueSize" validate:"required"`
+	IOTimeout  time.Duration `mapstructure:"ioTimeout" validate:"required"`
+	DebugPprof string        `mapstructure:"debugPprof"`
+	MaxMsgSize int           `mapstructure:"maxMsgSize"`
 }
 
 type WebSocketServer struct {
 	Handler WebSocketHandler
 	Poller  netpoll.Poller
-	Pool    *Pool
+	Pool    *ants.Pool
 	Config  *WebSocketConfig
 }
 
@@ -66,7 +63,14 @@ func NewWebSocketServer(conf *WebSocketConfig, handler WebSocketHandler) *WebSoc
 		return nil
 	}
 
-	pool := NewPool(conf.Workers, conf.QueueSize, 1)
+	// Create an ants worker pool
+	pool, err := ants.NewPool(conf.Workers,
+		ants.WithPreAlloc(true),
+		ants.WithMaxBlockingTasks(conf.QueueSize),
+	)
+	if err != nil {
+		return nil
+	}
 
 	return &WebSocketServer{
 		Handler: handler,
@@ -88,7 +92,6 @@ func NewWebSocketServer(conf *WebSocketConfig, handler WebSocketHandler) *WebSoc
  * Returns:
  *   - error: An error if the server fails to start or encounters an issue.
  */
-
 func (s *WebSocketServer) Start(ctx context.Context, log logger.Zapper) error {
 	if s.Config.DebugPprof != "" {
 		log.Infof(ctx, "starting pprof server on %s", s.Config.DebugPprof)
@@ -120,6 +123,8 @@ func (s *WebSocketServer) Start(ctx context.Context, log logger.Zapper) error {
 		} else {
 			log.Info(ctx, "WebSocket listener closed gracefully")
 		}
+		// Release the pool resources
+		s.Pool.Release()
 	}()
 
 	return nil
@@ -128,7 +133,7 @@ func (s *WebSocketServer) Start(ctx context.Context, log logger.Zapper) error {
 /*
  * setupConnAcceptor sets up the connection acceptor for the WebSocket server. It starts the poller to listen for
  * incoming connections and schedules them to be handled by the worker pool. If an error occurs during acceptance,
- * it handles retries with a cooldown period.
+ * it uses a retry policy to attempt reconnection.
  *
  * Parameters:
  *   - ctx: The context to control the server's lifecycle.
@@ -138,35 +143,76 @@ func (s *WebSocketServer) Start(ctx context.Context, log logger.Zapper) error {
  *   - log: The logger instance for logging server events.
  */
 func (s *WebSocketServer) setupConnAcceptor(ctx context.Context, ln net.Listener, acceptDesc *netpoll.Desc, accept chan error, log logger.Zapper) {
+	// Create retry policy outside the poller function to avoid recreation on each event
+	retryPolicy := retrypolicy.Builder[any]().
+		WithMaxRetries(3).
+		WithDelay(100*time.Millisecond).
+		WithJitter(time.Duration(0.2*float64(time.Second))).
+		WithBackoff(2, 200*time.Millisecond).
+		OnRetry(func(e failsafe.ExecutionEvent[any]) {
+			log.Warnf(ctx, "retry attempt %d/%d after error: %v", e.Attempts(), 3, e.LastError())
+		}).
+		Build()
+
 	s.Poller.Start(acceptDesc, func(e netpoll.Event) {
-		err := s.Pool.ScheduleTimeout(time.Millisecond, func() {
-			conn, err := ln.Accept()
-			if err != nil {
-				accept <- err
-				return
-			}
-
-			accept <- nil
-			s.handleConnection(ctx, conn, log)
-		})
-
-		if err == nil {
-			err = <-accept
-		}
+		// Accept new connection with retry capability
+		err := acceptConnection(ctx, s, ln, accept, retryPolicy, log)
 
 		if err != nil {
-			if shouldRetryAfterCooldown(err) {
-				cooldownAndRetry(ctx, err, log)
-				s.Poller.Resume(acceptDesc)
-				return
-			}
-
 			log.Errorf(ctx, "fatal accept error: %v", err)
 			return
 		}
 
+		// Resume accepting new connections
 		s.Poller.Resume(acceptDesc)
 	})
+}
+
+/*
+ * acceptConnection accepts a new WebSocket connection with retry capability. It uses a retry policy to handle
+ * transient errors during the acceptance process. The accepted connection is then handled by the worker pool.
+ *
+ * Parameters:
+ *   - ctx: The context to control the server's lifecycle.
+ *   - s: The WebSocket server instance.
+ *   - ln: The TCP listener for accepting connections.
+ *   - accept: A channel to communicate acceptance errors.
+ *   - retryPolicy: The retry policy to use for accepting connections.
+ *   - log: The logger instance for logging server events.
+ *
+ * Returns:
+ *   - error: An error if the connection acceptance fails after retries.
+ */
+func acceptConnection(ctx context.Context, s *WebSocketServer, ln net.Listener, accept chan error,
+	retryPolicy retrypolicy.RetryPolicy[any], log logger.Zapper) error {
+
+	_, err := failsafe.Get(
+
+		func() (interface{}, error) {
+
+			return nil, s.Pool.Submit(func() {
+
+				conn, err := ln.Accept()
+
+				if err != nil {
+					accept <- err
+					return
+				}
+
+				accept <- nil
+
+				s.handleConnection(ctx, conn, log)
+			})
+		},
+		retryPolicy,
+	)
+
+	if err == nil {
+		// Wait for the result of connection acceptance
+		err = <-accept
+	}
+
+	return err
 }
 
 /*
@@ -222,12 +268,18 @@ func (s *WebSocketServer) startConnectionPoller(ctx context.Context, desc *netpo
 			return
 		}
 
-		s.Pool.Schedule(func() {
+		// Use ants pool for message handling
+		err := s.Pool.Submit(func() {
 			if err := s.readMessage(ctx, wsConn); err != nil {
 				log.Errorf(ctx, "error reading message: %v", err)
 				handleClose(ctx, s, desc, wsConn, conn)
 			}
 		})
+
+		if err != nil {
+			log.Errorf(ctx, "failed to schedule message reading: %v", err)
+			handleClose(ctx, s, desc, wsConn, conn)
+		}
 	})
 }
 

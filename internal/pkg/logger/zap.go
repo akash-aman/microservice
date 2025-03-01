@@ -56,10 +56,6 @@ func newZapLogger(cfg *LoggerConfig, provider *sdklog.LoggerProvider) Zapper {
 	otelLogger := otelzap.New(
 		logger,
 		otelzap.WithLoggerProvider(provider),
-		//otelzap.WithCaller(true),
-		// otelzap.WithExtraFields(
-		// 	zap.String("caller",helper.Caller(10)),
-		// ),
 	)
 	return &zapLogger{logger: otelLogger}
 }
