@@ -8,16 +8,16 @@ import (
 	"pkg/otel/conf"
 	"time"
 
-	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
+	"go.opentelemetry.io/otel/sdk/resource"
 )
 
 func ConfigOpenTelementryLogs(ctx context.Context, conf *conf.OtelConfig, res *resource.Resource) *sdklog.LoggerProvider {
 	var secureOption otlploghttp.Option
 
-	collectorURL := fmt.Sprintf("%s%s", conf.Host, conf.Http)
+	collectorURL := fmt.Sprintf("%s:%d", conf.Host, conf.Http)
 
 	if !conf.Insecure {
 		secureOption = otlploghttp.WithTLSClientConfig(&tls.Config{})

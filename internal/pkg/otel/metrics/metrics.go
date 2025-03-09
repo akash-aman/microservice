@@ -15,7 +15,7 @@ import (
 
 func ConfigOpenTelementryMeter(ctx context.Context, conf *conf.OtelConfig, res *resource.Resource) *metricsdk.MeterProvider {
 
-	collectorURL := fmt.Sprintf("%s%s", conf.Host, conf.Grpc)
+	collectorURL := fmt.Sprintf("%s:%d", conf.Host, conf.Grpc)
 
 	var secureOption otlpmetricgrpc.Option
 

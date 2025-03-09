@@ -1,0 +1,5 @@
+export TELEMETRY_HOST="Akashs-MacBook-Pro.local"
+export ECHO_HOST="Akashs-MacBook-Pro.local"
+export SQL_HOST="Akashs-MacBook-Pro.local"
+export GRAPHQL_HOST="Akashs-MacBook-Pro.local"
+export WEBSOCKET_HOST="Akashs-MacBook-Pro.local"

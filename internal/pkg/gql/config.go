@@ -6,7 +6,7 @@ import (
 )
 
 type GraphQLConfig struct {
-	Port         string        `mapstructure:"port"`
+	Port         int           `mapstructure:"port"`
 	Host         string        `mapstructure:"host"`
 	ReadTimeout  time.Duration `mapstructure:"readTimeout"`
 	WriteTimeout time.Duration `mapstructure:"writeTimeout"`

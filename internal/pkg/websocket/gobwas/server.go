@@ -42,7 +42,7 @@ import (
 // WebSocketConfig holds configuration for the WebSocket server
 type WebSocketConfig struct {
 	Host       string        `mapstructure:"host" validate:"required"`
-	Port       string        `mapstructure:"port" validate:"required"`
+	Port       int           `mapstructure:"port" validate:"required"`
 	Workers    int           `mapstructure:"workers" validate:"required"`
 	QueueSize  int           `mapstructure:"queueSize" validate:"required"`
 	IOTimeout  time.Duration `mapstructure:"ioTimeout" validate:"required"`
@@ -100,7 +100,7 @@ func (s *WebSocketServer) Start(ctx context.Context, log logger.Zapper) error {
 		}()
 	}
 
-	addr := fmt.Sprintf("%s%s", s.Config.Host, s.Config.Port)
+	addr := fmt.Sprintf("%s:%d", s.Config.Host, s.Config.Port)
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		return fmt.Errorf("failed to create listener: %w", err)

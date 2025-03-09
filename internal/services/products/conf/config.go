@@ -15,6 +15,7 @@ import (
 	"pkg/websocket/gobwas"
 	"products/app/core/models"
 	"runtime"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -59,9 +60,9 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfi
 	cnf := &Config{}
 
 	/**
-	 * configPath : Supplied through flag.
-	 * configPathFromEnv : Supplied through env variable.
-	 * dirname() : directory from where this function is called.
+	* configPath : Supplied through flag.
+	* configPathFromEnv : Supplied through env variable.
+	* dirname() : directory from where this function is called.
 	 */
 	if configPath == "" {
 		configPathFromEnv := os.Getenv("CONFIG_PATH")
@@ -81,8 +82,26 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfi
 	viper.AddConfigPath(configPath)
 	viper.SetConfigType("json")
 
+	// Enable environment variable substitution
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	// Custom function to replace ${VAR} with environment variables
+	viper.SetTypeByDefaultValue(true)
+
 	if err := viper.ReadInConfig(); err != nil {
 		log.Println("Error reading config file:", err)
+		return nil, nil, nil, nil, nil, nil, nil, err
+	}
+
+	// Process environment variable substitutions
+	configMap := viper.AllSettings()
+	processEnvVars(configMap)
+
+	// Convert back to viper
+	err := viper.MergeConfigMap(configMap)
+	if err != nil {
+		log.Println("Error merging processed config:", err)
 		return nil, nil, nil, nil, nil, nil, nil, err
 	}
 
@@ -94,6 +113,53 @@ func InitConfig() (*Config, *http.EchoConfig, *logger.LoggerConfig, *db.SQLConfi
 	log.Println("Config loaded successfully from:", configPath)
 
 	return cnf, cnf.Echo, cnf.Logger, cnf.Sql, cnf.GraphQL, cnf.Otel, cnf.WSConfig, nil
+}
+
+/**
+ * processEnvVars processes a configuration map and substitutes environment variable placeholders
+ * with their corresponding values from the environment. It supports nested maps and arrays.
+ *
+ * The function iterates over the provided configMap and checks if any string values are in the
+ * format "${ENV_VAR}". If such a placeholder is found, it retrieves the value of the environment
+ * variable ENV_VAR and replaces the placeholder with the actual value. The function also handles
+ * nested maps and arrays, recursively processing them to substitute any environment variable
+ * placeholders found within.
+ *
+ * Parameters:
+ * - configMap: A map[string]interface{} representing the configuration to be processed.
+ */
+func processEnvVars(configMap map[string]interface{}) {
+	for key, value := range configMap {
+		switch v := value.(type) {
+		case string:
+			// Process string values for environment variable substitution
+			if strings.HasPrefix(v, "${") && strings.HasSuffix(v, "}") {
+				envVar := strings.TrimSuffix(strings.TrimPrefix(v, "${"), "}")
+				envValue := os.Getenv(envVar)
+				if envValue != "" {
+					configMap[key] = envValue
+				}
+			}
+		case map[string]interface{}:
+			// Recursively process nested maps
+			processEnvVars(v)
+		case []interface{}:
+			// Process arrays
+			for i, item := range v {
+				if strItem, ok := item.(string); ok {
+					if strings.HasPrefix(strItem, "${") && strings.HasSuffix(strItem, "}") {
+						envVar := strings.TrimSuffix(strings.TrimPrefix(strItem, "${"), "}")
+						envValue := os.Getenv(envVar)
+						if envValue != "" {
+							v[i] = envValue
+						}
+					}
+				} else if mapItem, ok := item.(map[string]interface{}); ok {
+					processEnvVars(mapItem)
+				}
+			}
+		}
+	}
 }
 
 /**

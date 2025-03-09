@@ -104,4 +104,3 @@
 - **logs**: Error & access logs.
 - **server**: Server related code.
 - **sqlc**: SQL code and database migrations.
-![alt text](image.png)

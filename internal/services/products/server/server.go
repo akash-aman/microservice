@@ -33,7 +33,7 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Za
 			 */
 			go func() {
 
-				log.Info(ctx, "starting echo server", zap.String("port", config.Echo.Port))
+				log.Info(ctx, "starting echo server", zap.Int("port", config.Echo.Port))
 
 				if err := server.RunEchoServer(ctx, e, log, config.Echo); !errors.Is(err, http.ErrServerClosed) {
 					log.Error(ctx, "error starting echo server", zap.Error(err))
