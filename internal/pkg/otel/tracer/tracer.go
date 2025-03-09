@@ -23,7 +23,7 @@ import (
 
 func ConfigOpenTelementryTracer(ctx context.Context, conf *conf.OtelConfig, res *resource.Resource) *sdktrace.TracerProvider {
 
-	collectorURL := fmt.Sprintf("%s%s", conf.Host, conf.Grpc)
+	collectorURL := fmt.Sprintf("%s:%d", conf.Host, conf.Grpc)
 
 	var secureOption otlptracegrpc.Option
 

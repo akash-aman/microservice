@@ -6,9 +6,7 @@ package otel
  */
 import (
 	"context"
-	"fmt"
 	"log"
-	"os"
 	"pkg/otel/conf"
 	"pkg/otel/logs"
 	"pkg/otel/metrics"
@@ -22,14 +20,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-var (
-	collectorURL = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-)
-
 func InitOpentelemetry(ctx context.Context, conf *conf.OtelConfig) (*sdklog.LoggerProvider, *sdktrace.TracerProvider, *metric.MeterProvider) {
-	if collectorURL == "" {
-		collectorURL = fmt.Sprintf("%s%s", conf.Host, conf.Port)
-	}
 
 	resources, err := resource.New(ctx,
 		//resource.WithFromEnv(),

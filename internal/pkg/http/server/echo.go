@@ -18,7 +18,7 @@ const (
 )
 
 type EchoConfig struct {
-	Port      string `mapstructure:"port" validate:"required"`
+	Port      int    `mapstructure:"port" validate:"required"`
 	Host      string `mapstructure:"host"`
 	BaseRoute string `mapstructure:"baseRoute" validate:"required"`
 	DebugMode bool   `mapstructure:"debugMode" validate:"required"`
@@ -57,14 +57,14 @@ func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.Zapper, cfg 
 	if err := discovery.RegisterServiceWithConsul(
 		ctx, "echo-http-service",
 		fmt.Sprintf("echo-http-service-%s", helper.GetMachineID()),
-		fmt.Sprintf("http://%s", "host.docker.internal"),
-		helper.GetPort(cfg.Port),
+		fmt.Sprintf("http://%s", cfg.Host),
+		cfg.Port,
 		discovery.HTTPService,
 		log,
 	); err != nil {
 		log.Errorf(ctx, "Error registering with Consul: %v", err)
 	}
 
-	err := echo.Start(cfg.Port)
+	err := echo.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
 	return err
 }

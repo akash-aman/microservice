@@ -55,7 +55,7 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zappe
 		w.Write([]byte("OK"))
 	}), "Health Check Endpoint"))
 
-	server.Addr = conf.Port
+	server.Addr = fmt.Sprintf("%s:%d", conf.Host, conf.Port)
 	server.Handler = http.DefaultServeMux
 
 	go func() {
@@ -68,14 +68,14 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zappe
 		}
 	}()
 
-	log.Info(ctx, "Starting GraphQL Server", zap.String("port", conf.Port))
+	log.Info(ctx, "Starting GraphQL Server", zap.Int("port", conf.Port))
 
 	if err := discovery.RegisterServiceWithConsul(
 		ctx,
 		"echo-graphql-service",
 		fmt.Sprintf("echo-graphql-service-%s", helper.GetMachineID()),
-		fmt.Sprintf("http://%s", "host.docker.internal"), // conf.Port
-		helper.GetPort(conf.Port),
+		conf.Host,
+		conf.Port,
 		discovery.HTTPService,
 		log,
 	); err != nil {

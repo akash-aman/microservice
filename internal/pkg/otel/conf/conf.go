@@ -2,9 +2,9 @@ package conf
 
 type OtelConfig struct {
 	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	Grpc     string `mapstructure:"grpc"`
-	Http     string `mapstructure:"http"`
+	Port     int    `mapstructure:"port"`
+	Grpc     int    `mapstructure:"grpc"`
+	Http     int    `mapstructure:"http"`
 	Service  string `mapstructure:"service"`
 	Insecure bool   `mapstructure:"insecure"`
 }
