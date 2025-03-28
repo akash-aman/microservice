@@ -89,6 +89,11 @@ go run ./cgfx/ent/entc.go
 go get github.com/99designs/gqlgen
 go run github.com/99designs/gqlgen
 ```
+- GRPC Code Gen
+
+```
+protoc --go_out=. --go-grpc_out=. ./app/grpc/server/proto/product.proto
+```
 
 ## To Do
 

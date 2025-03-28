@@ -3,13 +3,16 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"pkg/helper"
 	"pkg/http/server"
 	"pkg/logger"
 	"pkg/otel/metrics"
 	"products/app/inits"
 	"products/cgfx/ent/gen"
 	"products/conf"
+	"pkg/grpc"
 
 	metricsdk "go.opentelemetry.io/otel/sdk/metric"
 
@@ -23,7 +26,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Zapper, config *conf.Config, gqlsrv *http.Server, provider *metricsdk.MeterProvider, ctx context.Context) {
+func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Zapper, config *conf.Config, gqlsrv *http.Server, provider *metricsdk.MeterProvider, grpcgrpcServer *grpc.GrpcServer, ctx context.Context) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
@@ -32,9 +35,6 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Za
 			 * Http Server
 			 */
 			go func() {
-
-				log.Info(ctx, "starting echo server", zap.Int("port", config.Echo.Port))
-
 				if err := server.RunEchoServer(ctx, e, log, config.Echo); !errors.Is(err, http.ErrServerClosed) {
 					log.Error(ctx, "error starting echo server", zap.Error(err))
 				}
@@ -45,6 +45,15 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Za
 			 */
 			go func() {
 				if err := inits.InitGraphQLServer(ctx, client, log, config.GraphQL, gqlsrv); !errors.Is(err, http.ErrServerClosed) {
+					log.Error(ctx, "Error starting GraphQL server", zap.Error(err))
+				}
+			}()
+
+			/**
+			 * Grpc Server
+			 */
+			go func() {
+				if err := grpcgrpcServer.RunGrpcServer(ctx, log, config.Service.Name); !errors.Is(err, http.ErrServerClosed) {
 					log.Error(ctx, "Error starting GraphQL server", zap.Error(err))
 				}
 			}()
@@ -62,7 +71,7 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, client *gen.Client, log logger.Za
 			 * Service Route
 			 */
 			e.GET("/", func(c echo.Context) error {
-				return c.String(http.StatusOK, config.Service.Name)
+				return c.String(http.StatusOK, fmt.Sprintf("%s : %s", config.Service.Name, helper.GetMachineID()))
 			})
 
 			/**

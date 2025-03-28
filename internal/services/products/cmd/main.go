@@ -3,6 +3,7 @@ package main
 import (
 	"pkg/db"
 	"pkg/gql"
+	"pkg/grpc"
 	http "pkg/http"
 	httpServer "pkg/http/server"
 	"pkg/logger"
@@ -37,6 +38,7 @@ func main() {
 			otel.InitOpentelemetry,
 			gobwas.NewWebSocketHander,
 			gobwas.NewWebSocketServer,
+			grpc.NewGrpcServer,
 		),
 		fx.Invoke(server.RunServers),
 		fx.Invoke(inits.InitMediator),
@@ -44,5 +46,6 @@ func main() {
 		fx.Invoke(inits.ConfigSwagger),
 		fx.Invoke(inits.ConfigMiddlewares),
 		fx.Invoke(inits.InitWebsocket),
+		fx.Invoke(inits.ConfigGrpcServer),
 	).Run()
 }

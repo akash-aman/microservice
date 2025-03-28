@@ -39,20 +39,22 @@ func RunEchoServer(ctx context.Context, echo *echo.Echo, log logger.Zapper, cfg 
 	echo.Server.MaxHeaderBytes = MaxHeaderBytes
 
 	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				log.Infof(ctx, "Shutting down HTTP PORT: {%s}", cfg.Port)
-				err := echo.Shutdown(ctx)
-				if err != nil {
-					log.Errorf(ctx, "Error shutting down HTTP server {%v}", err)
-					return
-				}
-				log.Info(ctx, "HTTP server shutdown gracefully")
+		for range ctx.Done() {
+
+			log.Infof(ctx, "Shutting down HTTP PORT: {%s}", cfg.Port)
+			err := echo.Shutdown(ctx)
+
+			if err != nil {
+				log.Errorf(ctx, "Error shutting down HTTP server {%v}", err)
 				return
 			}
+
+			log.Info(ctx, "HTTP server shutdown gracefully")
 		}
 	}()
+
+	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	log.Infof(ctx, "Echo Server Listening on %s", addr)
 
 	if err := discovery.RegisterServiceWithConsul(
 		ctx, "echo-http-service",
