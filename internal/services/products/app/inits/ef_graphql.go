@@ -68,7 +68,8 @@ func InitGraphQLServer(ctx context.Context, client *gen.Client, log logger.Zappe
 		}
 	}()
 
-	log.Info(ctx, "Starting GraphQL Server", zap.Int("port", conf.Port))
+	addr := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
+	log.Infof(ctx, "GraphQL Server Listening on %s", addr)
 
 	if err := discovery.RegisterServiceWithConsul(
 		ctx,

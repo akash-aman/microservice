@@ -106,7 +106,7 @@ func (s *WebSocketServer) Start(ctx context.Context, log logger.Zapper) error {
 		return fmt.Errorf("failed to create listener: %w", err)
 	}
 
-	log.Infof(ctx, "websocket is listening on %s", ln.Addr().String())
+	log.Infof(ctx, "Websocket Server Listening on %s", addr)
 
 	acceptDesc := netpoll.Must(netpoll.HandleListener(
 		ln, netpoll.EventRead|netpoll.EventOneShot,

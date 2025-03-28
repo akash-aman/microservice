@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"regexp"
@@ -137,3 +138,57 @@ func getContainerID() string {
 
 	return ""
 }
+
+/**
+ * GetHostname returns the identification of the current machine in order of preference:
+ * 1. System hostname
+ * 2. External IP address
+ * 3. Internal IP address
+ * 4. UUID as last resort
+ *
+ * Returns:
+ *   - string: The identifier for the machine
+ */
+func GetHostname() string {
+
+	envValue := os.Getenv("HOSTNAME")
+
+	if envValue != "" {
+		return envValue
+	}
+
+	if hostname, err := os.Hostname(); err == nil {
+		return hostname
+	}
+
+	if internalIP, err := getInternalIP(); err == nil {
+		return internalIP
+	}
+
+	return "0.0.0.0"
+}
+
+/**
+ * getInternalIP attempts to get the internal IP address.
+ */
+func getInternalIP() (string, error) {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "", err
+	}
+
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String(), nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no internal IP address found")
+}
+
+
+/**
+ * 
+ */
