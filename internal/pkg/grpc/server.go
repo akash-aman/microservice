@@ -144,6 +144,5 @@ func (s *GrpcServer) shutdown(service string) {
 		s.Log.Errorf(context.Background(), "Failed to deregister service: %v", err)
 	}
 
-	s.Grpc.Stop()
 	s.Grpc.GracefulStop()
 }
