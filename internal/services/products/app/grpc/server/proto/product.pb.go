@@ -667,14 +667,18 @@ const file_app_grpc_server_proto_product_proto_rawDesc = "" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
 	"\x05price\x18\x04 \x01(\x02R\x05price\"C\n" +
 	"\vProductList\x124\n" +
-	"\bproducts\x18\x01 \x03(\v2\x18.product_service.ProductR\bproducts2\xe4\x03\n" +
+	"\bproducts\x18\x01 \x03(\v2\x18.product_service.ProductR\bproducts2\x9d\x06\n" +
 	"\x0eProductService\x12U\n" +
 	"\n" +
 	"GetProduct\x12\".product_service.GetProductRequest\x1a#.product_service.GetProductResponse\x12[\n" +
 	"\fListProducts\x12$.product_service.ListProductsRequest\x1a%.product_service.ListProductsResponse\x12^\n" +
 	"\rCreateProduct\x12%.product_service.CreateProductRequest\x1a&.product_service.CreateProductResponse\x12^\n" +
 	"\rUpdateProduct\x12%.product_service.UpdateProductRequest\x1a&.product_service.UpdateProductResponse\x12^\n" +
-	"\rDeleteProduct\x12%.product_service.DeleteProductRequest\x1a&.product_service.DeleteProductResponseB\x17Z\x15app/grpc/server/protob\x06proto3"
+	"\rDeleteProduct\x12%.product_service.DeleteProductRequest\x1a&.product_service.DeleteProductResponse\x12L\n" +
+	"\x12BiDiStreamProducts\x12\x18.product_service.Product\x1a\x18.product_service.Product(\x010\x01\x12P\n" +
+	"\x14ClientStreamProducts\x12\x18.product_service.Product\x1a\x1c.product_service.ProductList(\x01\x12L\n" +
+	"\x14ServerStreamProducts\x12\x18.product_service.Product\x1a\x18.product_service.Product0\x01\x12I\n" +
+	"\x13UnaryStreamProducts\x12\x18.product_service.Product\x1a\x18.product_service.ProductB\x17Z\x15app/grpc/server/protob\x06proto3"
 
 var (
 	file_app_grpc_server_proto_product_proto_rawDescOnce sync.Once
@@ -714,13 +718,21 @@ var file_app_grpc_server_proto_product_proto_depIdxs = []int32{
 	4,  // 7: product_service.ProductService.CreateProduct:input_type -> product_service.CreateProductRequest
 	6,  // 8: product_service.ProductService.UpdateProduct:input_type -> product_service.UpdateProductRequest
 	8,  // 9: product_service.ProductService.DeleteProduct:input_type -> product_service.DeleteProductRequest
-	1,  // 10: product_service.ProductService.GetProduct:output_type -> product_service.GetProductResponse
-	3,  // 11: product_service.ProductService.ListProducts:output_type -> product_service.ListProductsResponse
-	5,  // 12: product_service.ProductService.CreateProduct:output_type -> product_service.CreateProductResponse
-	7,  // 13: product_service.ProductService.UpdateProduct:output_type -> product_service.UpdateProductResponse
-	9,  // 14: product_service.ProductService.DeleteProduct:output_type -> product_service.DeleteProductResponse
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
+	10, // 10: product_service.ProductService.BiDiStreamProducts:input_type -> product_service.Product
+	10, // 11: product_service.ProductService.ClientStreamProducts:input_type -> product_service.Product
+	10, // 12: product_service.ProductService.ServerStreamProducts:input_type -> product_service.Product
+	10, // 13: product_service.ProductService.UnaryStreamProducts:input_type -> product_service.Product
+	1,  // 14: product_service.ProductService.GetProduct:output_type -> product_service.GetProductResponse
+	3,  // 15: product_service.ProductService.ListProducts:output_type -> product_service.ListProductsResponse
+	5,  // 16: product_service.ProductService.CreateProduct:output_type -> product_service.CreateProductResponse
+	7,  // 17: product_service.ProductService.UpdateProduct:output_type -> product_service.UpdateProductResponse
+	9,  // 18: product_service.ProductService.DeleteProduct:output_type -> product_service.DeleteProductResponse
+	10, // 19: product_service.ProductService.BiDiStreamProducts:output_type -> product_service.Product
+	11, // 20: product_service.ProductService.ClientStreamProducts:output_type -> product_service.ProductList
+	10, // 21: product_service.ProductService.ServerStreamProducts:output_type -> product_service.Product
+	10, // 22: product_service.ProductService.UnaryStreamProducts:output_type -> product_service.Product
+	14, // [14:23] is the sub-list for method output_type
+	5,  // [5:14] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name

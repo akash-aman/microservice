@@ -91,6 +91,7 @@
     - **middlewares**: Middleware functions.
     - **models**: Data models and schemas.
   - **data**: Data access layer.
+  - **grpc**: Grpc server implementation, and grpc client client setup.
   - **infra**: Infrastructure related code.
     - **bulk-factory**: Bulk processing utilities.
     - **scheduler**: Task scheduling utilities.

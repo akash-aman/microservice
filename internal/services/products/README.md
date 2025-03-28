@@ -89,6 +89,7 @@ go run ./cgfx/ent/entc.go
 go get github.com/99designs/gqlgen
 go run github.com/99designs/gqlgen
 ```
+
 - GRPC Code Gen
 
 ```
