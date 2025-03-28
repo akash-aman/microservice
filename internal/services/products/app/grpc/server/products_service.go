@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"io"
 	"pkg/logger"
 	products_service "products/app/grpc/server/proto"
 	"products/conf"
+	"time"
 )
 
 type ProductGrpcServerService struct {
@@ -99,5 +101,100 @@ func (s *ProductGrpcServerService) DeleteProduct(ctx context.Context, req *produ
 	// TODO: Implement database delete
 	return &products_service.DeleteProductResponse{
 		Id: req.Id,
+	}, nil
+}
+
+func (s *ProductGrpcServerService) BiDiStreamProducts(stream products_service.ProductService_BiDiStreamProductsServer) error {
+	s.log.Info(stream.Context(), "Starting bidirectional stream")
+
+	for {
+		product, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+
+		// Process the product and send back modified version
+		modifiedProduct := &products_service.Product{
+			Id:          product.Id,
+			Name:        "Modified: " + product.Name,
+			Description: product.Description,
+			Price:       product.Price * 1.1, // 10% price increase
+		}
+
+		time.Sleep(2 * time.Second)
+		if err := stream.Send(modifiedProduct); err != nil {
+			return err
+		}
+	}
+}
+
+func (s *ProductGrpcServerService) ClientStreamProducts(stream products_service.ProductService_ClientStreamProductsServer) error {
+	s.log.Info(stream.Context(), "Starting client stream")
+
+	var products []*products_service.Product
+	for {
+		product, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+		products = append(products, product)
+	}
+
+	// Process all received products and send back the list
+	return stream.SendAndClose(&products_service.ProductList{
+		Products: products,
+	})
+}
+
+func (s *ProductGrpcServerService) ServerStreamProducts(req *products_service.Product, stream products_service.ProductService_ServerStreamProductsServer) error {
+	s.log.Info(stream.Context(), "Starting server stream")
+
+	// Generate variations of the product
+	variations := []*products_service.Product{
+		{
+			Id:          req.Id + "-1",
+			Name:        req.Name + " (Small)",
+			Description: req.Description,
+			Price:       req.Price * 0.8,
+		},
+		{
+			Id:          req.Id + "-2",
+			Name:        req.Name + " (Medium)",
+			Description: req.Description,
+			Price:       req.Price,
+		},
+		{
+			Id:          req.Id + "-3",
+			Name:        req.Name + " (Large)",
+			Description: req.Description,
+			Price:       req.Price * 1.2,
+		},
+	}
+
+	for _, product := range variations {
+		time.Sleep(2 * time.Second)
+		if err := stream.Send(product); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *ProductGrpcServerService) UnaryStreamProducts(ctx context.Context, req *products_service.Product) (*products_service.Product, error) {
+	s.log.Infof(ctx, "Processing unary stream product: %s", req.Name)
+
+	// Process the product and return modified version
+	return &products_service.Product{
+		Id:          req.Id,
+		Name:        "Processed: " + req.Name,
+		Description: req.Description,
+		Price:       req.Price * 1.05, // 5% price increase
 	}, nil
 }

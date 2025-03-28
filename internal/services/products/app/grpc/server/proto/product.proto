@@ -10,6 +10,13 @@ service ProductService {
     rpc CreateProduct (CreateProductRequest) returns (CreateProductResponse);
     rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductResponse);
     rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
+   
+    // stream 
+    rpc BiDiStreamProducts (stream Product) returns (stream Product);
+    rpc ClientStreamProducts (stream Product) returns (ProductList);
+    rpc ServerStreamProducts (Product) returns (stream Product);
+    rpc UnaryStreamProducts (Product) returns (Product);
+
 }
 
 message GetProductRequest {

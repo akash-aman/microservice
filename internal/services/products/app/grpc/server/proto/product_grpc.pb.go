@@ -19,11 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProductService_GetProduct_FullMethodName    = "/product_service.ProductService/GetProduct"
-	ProductService_ListProducts_FullMethodName  = "/product_service.ProductService/ListProducts"
-	ProductService_CreateProduct_FullMethodName = "/product_service.ProductService/CreateProduct"
-	ProductService_UpdateProduct_FullMethodName = "/product_service.ProductService/UpdateProduct"
-	ProductService_DeleteProduct_FullMethodName = "/product_service.ProductService/DeleteProduct"
+	ProductService_GetProduct_FullMethodName           = "/product_service.ProductService/GetProduct"
+	ProductService_ListProducts_FullMethodName         = "/product_service.ProductService/ListProducts"
+	ProductService_CreateProduct_FullMethodName        = "/product_service.ProductService/CreateProduct"
+	ProductService_UpdateProduct_FullMethodName        = "/product_service.ProductService/UpdateProduct"
+	ProductService_DeleteProduct_FullMethodName        = "/product_service.ProductService/DeleteProduct"
+	ProductService_BiDiStreamProducts_FullMethodName   = "/product_service.ProductService/BiDiStreamProducts"
+	ProductService_ClientStreamProducts_FullMethodName = "/product_service.ProductService/ClientStreamProducts"
+	ProductService_ServerStreamProducts_FullMethodName = "/product_service.ProductService/ServerStreamProducts"
+	ProductService_UnaryStreamProducts_FullMethodName  = "/product_service.ProductService/UnaryStreamProducts"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -35,6 +39,11 @@ type ProductServiceClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*CreateProductResponse, error)
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*UpdateProductResponse, error)
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*DeleteProductResponse, error)
+	// stream
+	BiDiStreamProducts(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Product, Product], error)
+	ClientStreamProducts(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[Product, ProductList], error)
+	ServerStreamProducts(ctx context.Context, in *Product, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Product], error)
+	UnaryStreamProducts(ctx context.Context, in *Product, opts ...grpc.CallOption) (*Product, error)
 }
 
 type productServiceClient struct {
@@ -95,6 +104,61 @@ func (c *productServiceClient) DeleteProduct(ctx context.Context, in *DeleteProd
 	return out, nil
 }
 
+func (c *productServiceClient) BiDiStreamProducts(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Product, Product], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ProductService_ServiceDesc.Streams[0], ProductService_BiDiStreamProducts_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Product, Product]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ProductService_BiDiStreamProductsClient = grpc.BidiStreamingClient[Product, Product]
+
+func (c *productServiceClient) ClientStreamProducts(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[Product, ProductList], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ProductService_ServiceDesc.Streams[1], ProductService_ClientStreamProducts_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Product, ProductList]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ProductService_ClientStreamProductsClient = grpc.ClientStreamingClient[Product, ProductList]
+
+func (c *productServiceClient) ServerStreamProducts(ctx context.Context, in *Product, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Product], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ProductService_ServiceDesc.Streams[2], ProductService_ServerStreamProducts_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Product, Product]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ProductService_ServerStreamProductsClient = grpc.ServerStreamingClient[Product]
+
+func (c *productServiceClient) UnaryStreamProducts(ctx context.Context, in *Product, opts ...grpc.CallOption) (*Product, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Product)
+	err := c.cc.Invoke(ctx, ProductService_UnaryStreamProducts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility.
@@ -104,6 +168,11 @@ type ProductServiceServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*CreateProductResponse, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*UpdateProductResponse, error)
 	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error)
+	// stream
+	BiDiStreamProducts(grpc.BidiStreamingServer[Product, Product]) error
+	ClientStreamProducts(grpc.ClientStreamingServer[Product, ProductList]) error
+	ServerStreamProducts(*Product, grpc.ServerStreamingServer[Product]) error
+	UnaryStreamProducts(context.Context, *Product) (*Product, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -128,6 +197,18 @@ func (UnimplementedProductServiceServer) UpdateProduct(context.Context, *UpdateP
 }
 func (UnimplementedProductServiceServer) DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProduct not implemented")
+}
+func (UnimplementedProductServiceServer) BiDiStreamProducts(grpc.BidiStreamingServer[Product, Product]) error {
+	return status.Errorf(codes.Unimplemented, "method BiDiStreamProducts not implemented")
+}
+func (UnimplementedProductServiceServer) ClientStreamProducts(grpc.ClientStreamingServer[Product, ProductList]) error {
+	return status.Errorf(codes.Unimplemented, "method ClientStreamProducts not implemented")
+}
+func (UnimplementedProductServiceServer) ServerStreamProducts(*Product, grpc.ServerStreamingServer[Product]) error {
+	return status.Errorf(codes.Unimplemented, "method ServerStreamProducts not implemented")
+}
+func (UnimplementedProductServiceServer) UnaryStreamProducts(context.Context, *Product) (*Product, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnaryStreamProducts not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 func (UnimplementedProductServiceServer) testEmbeddedByValue()                        {}
@@ -240,6 +321,49 @@ func _ProductService_DeleteProduct_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_BiDiStreamProducts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ProductServiceServer).BiDiStreamProducts(&grpc.GenericServerStream[Product, Product]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ProductService_BiDiStreamProductsServer = grpc.BidiStreamingServer[Product, Product]
+
+func _ProductService_ClientStreamProducts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ProductServiceServer).ClientStreamProducts(&grpc.GenericServerStream[Product, ProductList]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ProductService_ClientStreamProductsServer = grpc.ClientStreamingServer[Product, ProductList]
+
+func _ProductService_ServerStreamProducts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Product)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ProductServiceServer).ServerStreamProducts(m, &grpc.GenericServerStream[Product, Product]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ProductService_ServerStreamProductsServer = grpc.ServerStreamingServer[Product]
+
+func _ProductService_UnaryStreamProducts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Product)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).UnaryStreamProducts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_UnaryStreamProducts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).UnaryStreamProducts(ctx, req.(*Product))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -267,7 +391,28 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteProduct",
 			Handler:    _ProductService_DeleteProduct_Handler,
 		},
+		{
+			MethodName: "UnaryStreamProducts",
+			Handler:    _ProductService_UnaryStreamProducts_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "BiDiStreamProducts",
+			Handler:       _ProductService_BiDiStreamProducts_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ClientStreamProducts",
+			Handler:       _ProductService_ClientStreamProducts_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ServerStreamProducts",
+			Handler:       _ProductService_ServerStreamProducts_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "app/grpc/server/proto/product.proto",
 }
