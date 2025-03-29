@@ -102,4 +102,5 @@ protoc --go_out=. --go-grpc_out=. ./app/grpc/server/proto/product.proto
 - [ ] Setup Custom GraphQL Server & Resolvers.
 - [ ] Setup Kafka Service for Communication between services.
 - [ ] Setup casbin for authorization.
-- [ ] Setup websockets & Grpc.
+- [ ] Setup auth for websockets & Grpc.
+- [ ] Payment integration.
