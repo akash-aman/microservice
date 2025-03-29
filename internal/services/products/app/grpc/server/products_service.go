@@ -1,5 +1,14 @@
 package server
 
+/**
+ * * For Concurrency
+ * - Please go through below docs to understand how concurrency plays its role.
+ * - https://github.com/grpc/grpc-go/blob/master/Documentation/concurrency.md
+ * 
+ * * For Encoding:
+ * - https://github.com/grpc/grpc-go/blob/master/Documentation/encoding.md
+ */
+
 import (
 	"context"
 	"io"
