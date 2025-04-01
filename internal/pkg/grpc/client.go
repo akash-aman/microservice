@@ -15,7 +15,7 @@ type grpcClient struct {
 	conn *grpc.ClientConn
 }
 
-type GrpcClientConfig map[string]GrpcConfig
+type GrpcClientsConfig map[string]GrpcConfig
 
 type GrpcClient interface {
 	GetGrpcConnection() *grpc.ClientConn
@@ -25,7 +25,7 @@ type GrpcClient interface {
 /**
  * NewGrpcClient to Call Grpc Server
  */
-func NewGrpcClient(ctx context.Context, client string, clientsConfig *GrpcClientConfig, log logger.Zapper) (GrpcClient, error) {
+func NewGrpcClient(ctx context.Context, client string, clientsConfig *GrpcClientsConfig, log logger.Zapper) (GrpcClient, error) {
 	var config GrpcConfig
 	var ok bool
 

@@ -1,0 +1,170 @@
+# ------------------------------------------------
+#               PRODUCTS APP
+# ------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      containers:
+        - name: product-container
+          image: akashaman/products:0.0.2
+          resources:
+            limits:
+              memory: "10Gi"
+              cpu: "3000m"
+            requests:
+              memory: "10Gi"
+              cpu: "3000m"
+          env:
+            - name: TELEMETRY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: products-service-config
+                  key: TELEMETRY_HOST
+
+            - name: ECHO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: products-service-config
+                  key: ECHO_HOST
+
+            - name: SQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: products-service-config
+                  key: SQL_HOST
+
+            - name: GRAPHQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: products-service-config
+                  key: GRAPHQL_HOST
+
+            - name: WEBSOCKET_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: products-service-config
+                  key: WEBSOCKET_HOST
+
+            - name: CONFIG_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: products-service-config
+                  key: CONFIG_PATH
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config.development.json
+              subPath: config.development.json
+
+          command: ["./products"]
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: products-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products-service
+spec:
+  sessionAffinity: None
+  type: LoadBalancer # LoadBalancer
+  selector:
+    app: products
+  ports:
+    - name: echo
+      protocol: TCP
+      port: 5004
+      targetPort: 5004
+      nodePort: 30000
+    - name: gql
+      protocol: TCP
+      port: 5005
+      targetPort: 5005
+      nodePort: 30001
+    - name: socket
+      protocol: TCP
+      port: 5006
+      targetPort: 5006
+      nodePort: 30002
+
+---
+# ------------------------------------------------
+#                     MYSQL
+# ------------------------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "300m"
+            requests:
+              memory: "1Gi"
+              cpu: "250m"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "password"
+            - name: MYSQL_DATABASE
+              value: "mydatabase"
+            - name: MYSQL_USER
+              value: "user"
+            - name: MYSQL_PASSWORD
+              value: "password"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: products-service-config
+data:
+  CONFIG_PATH: "/"
+  TELEMETRY_HOST: "otel-collector-service"
+  ECHO_HOST: "0.0.0.0"
+  SQL_HOST: "mysql-service"
+  GRAPHQL_HOST: "0.0.0.0"
+  WEBSOCKET_HOST: "0.0.0.0"
