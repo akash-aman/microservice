@@ -1,0 +1,72 @@
+{
+    "service": {
+        "name": "products",
+        "version": "0.0.1",
+        "protocol": [
+            "http",
+            "graphql",
+            "grpc",
+            "wss"
+        ]
+    },
+    "telemetry": {
+        "service": "products",
+        "host": "${TELEMETRY_HOST}",
+        "grpc": 4317,
+        "http": 4318,
+        "port": 4317,
+        "insecure": true
+    },
+    "logger": {
+        "level": "debug",
+        "type": "zap",
+        "fileLogging": false,
+        "encoding": "json",
+        "accessLog": "logs/access.log",
+        "errorLog": "logs/error.log"
+    },
+    "echo": {
+        "port": 5004,
+        "host": "${ECHO_HOST}",
+        "readTimeout": "10s",
+        "writeTimeout": "10s",
+        "BaseRoute": "/api",
+        "debugMode": true
+    },
+    "sql": {
+        "host": "${SQL_HOST}",
+        "name": "mysql",
+        "port": 3306,
+        "user": "user",
+        "password": "password",
+        "dbName": "mydatabase",
+        "sslMode": "disable",
+        "ConnStr": "user:password@tcp(${SQL_HOST}:3306)/mydatabase?parseTime=true",
+        "maxIdleConns": 10,
+        "maxOpenConns": 10,
+        "maxLifeTime": 3,
+        "maxIdleTime": 3
+    },
+    "graphql": {
+        "port": 5005,
+        "host": "${GRAPHQL_HOST}",
+        "readTimeout": "10s",
+        "writeTimeout": "10s",
+        "BaseRoute": "/graphql",
+        "debugMode": true
+    },
+    "websocket": {
+        "port": 5006,
+        "host": "${WEBSOCKET_HOST}",
+        "readTimeout": "10s",
+        "writeTimeout": "10s",
+        "BaseRoute": "/ws",
+        "debugMode": true,
+        "workers": 100,
+        "queueSize": 10000,
+        "preallocate": 1,
+        "ioTimeout": "10s",
+        "debugPprof": "",
+        "maxMsgSize": 1024
+    }
+}
