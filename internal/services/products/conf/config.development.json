@@ -85,5 +85,30 @@
             "port": 5007,
             "debugMode": true
         }
+    },
+    "kafka": {
+        "products-consumer": {
+            "brokers": [
+                "localhost:9092",
+                "localhost:9093",
+                "localhost:9094"
+            ],
+            "topic": "product-events",
+            "groupId": "products-consumer",
+            "partitionCount": 3,
+            "replicationFactor": 1,
+            "retentionHours": 24
+        },
+        "products-producer": {
+            "brokers": [
+                "localhost:9092",
+                "localhost:9093",
+                "localhost:9094"
+            ],
+            "topic": "product-events",
+            "partitionCount": 3,
+            "replicationFactor": 1,
+            "retentionHours": 24
+        }
     }
 }
